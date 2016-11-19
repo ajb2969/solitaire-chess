@@ -26,10 +26,9 @@ public class SoltrChessPTUI implements Observer {
         Scanner input = new Scanner(System.in);
         for(; ;){
             System.out.print("[move,new,restart,hint,solve,quit]> ");
-            String choice = input.nextLine();
+            String choice = input.nextLine(); //if input is incorrect, reask again
             model.evaluate(choice);
         }
-
 
     }
 
@@ -41,6 +40,11 @@ public class SoltrChessPTUI implements Observer {
     @Override
     //
     public void update(Observable o, Object arg) {
+
         model.printBoard();
+        if(model.isGoal()){
+            System.out.println("You won, Congrats!!");
+            System.exit(0);
+        }
     }
 }

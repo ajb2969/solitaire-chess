@@ -5,21 +5,34 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.*;
 import java.util.Observable;
+import backtracking.*;
 
 /**
  * Created by alexbrown on 11/11/16.
  */
-public class SoltrChessModel extends Observable{
+public class SoltrChessModel extends Observable implements  Configuration{
     private static final int BOARD_SIZE = 4;
     private static final int NUM_CARDS = BOARD_SIZE * BOARD_SIZE;
     private static String [][]board;
     private static String currFile;
 
     public SoltrChessModel(String fileName){
+        currFile = fileName;
         board = makeBoard(fileName);
+    }
+    public String[][] getBoard(){
+        return board;
     }
 
 
+    public SoltrChessModel(SoltrChessModel copy){
+        String [][] copyBoard = copy.getBoard();
+        for(int i = 0; i<BOARD_SIZE; i++){
+            for(int j = 0; j < BOARD_SIZE; j++){
+                this.board[i][j] = copyBoard[i][j];
+            }
+        }
+    }
 
     public String[][] makeBoard(String fileName){
         board = new String [BOARD_SIZE][BOARD_SIZE];
@@ -54,6 +67,8 @@ public class SoltrChessModel extends Observable{
         return board;
     }
 
+
+
     public void printBoard(){
         for(int i = 0; i<BOARD_SIZE; i++){
             for(int j = 0; j<BOARD_SIZE; j++){
@@ -66,38 +81,175 @@ public class SoltrChessModel extends Observable{
     public void evaluateMove(int sR,int sC,int dR,int dC){
         if(board[sR][sC].contains("-")){
             System.out.println("Invalid source element");
-            System.exit(1);
+            evaluate("move");
         }
-        if(board[sR][sC].contains("B")){
+        if(board[dR][dC].contains("-")){
+            System.out.println("Invalid Destination element");
+            evaluate("move");
+        }
+        if(board[sR][sC].contains("B")){ //Bishop - finished
+            ArrayList<Coordinates> allMovePossibilities = new ArrayList<Coordinates>();
+            ArrayList<Coordinates> validPossibilities = new ArrayList<Coordinates>();
+            for(int i = 0; i<BOARD_SIZE; i++){
+                allMovePossibilities.add(new Coordinates(sR+i,sC+i));
+                allMovePossibilities.add(new Coordinates(sR+i,sC-i));
+                allMovePossibilities.add(new Coordinates(sR-i,sC+i));
+                allMovePossibilities.add(new Coordinates(sR-i,sC-i));
+            }
+            for(int i = 0; i < allMovePossibilities.size(); i++){
+                Coordinates currObject = allMovePossibilities.get(i);
+                if(!((currObject.getX() < 0)||(currObject.getY() < 0)||(currObject.getX() >= BOARD_SIZE)||(currObject.getY() >= BOARD_SIZE))){
+                    validPossibilities.add(currObject);
+                }
+            }
+            for(Coordinates c: validPossibilities){
+                if ((c.getX() == dR) && (c.getY() == dC) && (!board[dR][dC].equals("-"))){
+                    String symbolBeingMoved = board[sR][sC];
+                    board[dR][dC] = symbolBeingMoved;
+                    board[sR][sC] = "-";
+                }
+            }
+            announce(null);
 
         }
-        else if(board[sR][sC].contains("K")){
+        else if(board[sR][sC].contains("K")){ //King -- finished
+            ArrayList<Coordinates> allMovePossibilities = new ArrayList<Coordinates>();
+            ArrayList<Coordinates> validPossibilities = new ArrayList<Coordinates>();
+            allMovePossibilities.add(new Coordinates(sR+1,sC));
+            allMovePossibilities.add(new Coordinates(sR-1,sC));
+            allMovePossibilities.add(new Coordinates(sR,sC+1));
+            allMovePossibilities.add(new Coordinates(sR,sC-1));
+            allMovePossibilities.add(new Coordinates(sR+1,sC-1));
+            allMovePossibilities.add(new Coordinates(sR-1,sC-1));
+            allMovePossibilities.add(new Coordinates(sR+1,sC+1));
+            allMovePossibilities.add(new Coordinates(sR-1,sC+1));
+
+            for(int i = 0; i < allMovePossibilities.size(); i++){
+                Coordinates currObject = allMovePossibilities.get(i);
+                if(!((currObject.getX() < 0)||(currObject.getY() < 0)||(currObject.getX() >= BOARD_SIZE)||(currObject.getY() >= BOARD_SIZE))){
+                    validPossibilities.add(currObject);
+                }
+            }
+            for(Coordinates c: validPossibilities){
+                if ((c.getX() == dR) && (c.getY() == dC) && (!board[dR][dC].equals("-"))){
+                    String symbolBeingMoved = board[sR][sC];
+                    board[dR][dC] = symbolBeingMoved;
+                    board[sR][sC] = "-";
+                }
+            }
+            announce(null);
+        }
+        else if(board[sR][sC].contains("N")){//knight - finished
+            ArrayList<Coordinates> allMovePossibilities = new ArrayList<Coordinates>();
+            ArrayList<Coordinates> validPossibilities = new ArrayList<Coordinates>();
+            allMovePossibilities.add(new Coordinates(sR + 2,sC - 1));
+            allMovePossibilities.add(new Coordinates(sR + 2,sC + 1));
+            allMovePossibilities.add(new Coordinates(sR + 1,sC - 2));
+            allMovePossibilities.add(new Coordinates(sR + 1,sC + 2));
+            allMovePossibilities.add(new Coordinates(sR - 2,sC + 1));
+            allMovePossibilities.add(new Coordinates(sR - 2,sC - 1));
+            allMovePossibilities.add(new Coordinates(sR - 1,sC + 2));
+            allMovePossibilities.add(new Coordinates(sR - 1,sC - 2));
+            for(int i=0; i<allMovePossibilities.size(); i++){
+                Coordinates currObject = allMovePossibilities.get(i);
+                if(((currObject.getX() >= 0) && currObject.getX()<BOARD_SIZE) && (currObject.getY()>=0 && currObject.getY()<BOARD_SIZE)){
+                    validPossibilities.add(currObject);
+                }
+
+            }
+            for(Coordinates c: validPossibilities){
+                if ((c.getX() == dR) && (c.getY() == dC) && (!board[dR][dC].equals("-"))){
+                    String symbolBeingMoved = board[sR][sC];
+                    board[dR][dC] = symbolBeingMoved;
+                    board[sR][sC] = "-";
+                }
+            }
+            announce(null);
 
         }
-        else if(board[sR][sC].contains("N")){
+        else if(board[sR][sC].contains("P")){//Pawn - finished
+            ArrayList<Coordinates> movePossibilities = new ArrayList<Coordinates>();
+            movePossibilities.add(new Coordinates(sR - 1,sC + 1));
+            movePossibilities.add(new Coordinates(sR - 1,sC - 1));
 
-        }
-        else if(board[sR][sC].contains("P")){
+            for(Coordinates c: movePossibilities){
+                if ((c.getX() == dR) && (c.getY() == dC) && (!board[dR][dC].equals("-"))){
+                    String symbolBeingMoved = board[sR][sC];
+                    board[dR][dC] = symbolBeingMoved;
+                    board[sR][sC] = "-";
+                }
+            }
 
+            announce(null);
         }
-        else if(board[sR][sC].contains("R")){
+        else if(board[sR][sC].contains("R")){//Rook -- finished
+            ArrayList<Coordinates> allMovePossibilities = new ArrayList<Coordinates>();
+            ArrayList<Coordinates> validPossibilities = new ArrayList<Coordinates>();
+            for(int i = 0; i<BOARD_SIZE; i++){
+                allMovePossibilities.add(new Coordinates(sR, sC+i));
+                allMovePossibilities.add(new Coordinates(sR, sC-i));
+                allMovePossibilities.add(new Coordinates(sR+i, sC));
+                allMovePossibilities.add(new Coordinates(sR-i, sC));
+            }
+            for(int i=0; i<allMovePossibilities.size(); i++){
+                Coordinates currObject = allMovePossibilities.get(i);
+                if(((currObject.getX() >= 0) && currObject.getX()<BOARD_SIZE) && (currObject.getY()>=0 && currObject.getY()<BOARD_SIZE)){
+                    validPossibilities.add(currObject);
+                }
 
+            }
+            for(Coordinates c: validPossibilities){
+                if ((c.getX() == dR) && (c.getY() == dC) && (!board[dR][dC].equals("-"))){
+                    String symbolBeingMoved = board[sR][sC];
+                    board[dR][dC] = symbolBeingMoved;
+                    board[sR][sC] = "-";
+                }
+            }
+            announce(null);
+            
         }
-        else{ //contains Q
+        else{ //contains Queen - finished
+            ArrayList<Coordinates> allMovePossibilities = new ArrayList<Coordinates>();
+            ArrayList<Coordinates> validPossibilities = new ArrayList<Coordinates>();
+            for(int i = 0; i<BOARD_SIZE; i++){
+                allMovePossibilities.add(new Coordinates(sR,sC+i));
+                allMovePossibilities.add(new Coordinates(sR,sC-i));
+                allMovePossibilities.add(new Coordinates(sR+i,sC));
+                allMovePossibilities.add(new Coordinates(sR-i,sC));
+                allMovePossibilities.add(new Coordinates(sR+i,sC+i));
+                allMovePossibilities.add(new Coordinates(sR+i,sC-i));
+                allMovePossibilities.add(new Coordinates(sR-i,sC+i));
+                allMovePossibilities.add(new Coordinates(sR-i,sC-i));
+            }
+            for(int i=0; i<allMovePossibilities.size(); i++){
+                Coordinates currObject = allMovePossibilities.get(i);
+                if(((currObject.getX() >= 0) && currObject.getX()<BOARD_SIZE) && (currObject.getY()>=0 && currObject.getY()<BOARD_SIZE)){
+                    validPossibilities.add(currObject);
+                }
+
+            }
+            for(Coordinates c: validPossibilities){
+                if ((c.getX() == dR) && (c.getY() == dC) && (!board[dR][dC].equals("-"))){
+                    String symbolBeingMoved = board[sR][sC];
+                    board[dR][dC] = symbolBeingMoved;
+                    board[sR][sC] = "-";
+                }
+            }
+            announce(null);
 
         }
 
     }
-    public void evaluate(String choice){
+    public void evaluate(String choice){ // still have to complete hint and solve
         Scanner input = new Scanner(System.in);
         if(choice.equals("move")){
             System.out.print("Enter the source row: ");
             int sourceRow = input.nextInt();
-            System.out.print("\nEnter the source col: ");
+            System.out.print("Enter the source col: ");
             int sourceCol = input.nextInt();
-            System.out.print("\nEnter the dest row: ");
+            System.out.print("Enter the dest row: ");
             int destRow = input.nextInt();
-            System.out.print("\nEnter the dest col: ");
+            System.out.print("Enter the dest col: ");
             int destCol = input.nextInt();
             evaluateMove(sourceRow,sourceCol,destRow,destCol);
 
@@ -106,6 +258,7 @@ public class SoltrChessModel extends Observable{
             System.out.print("Enter file name: ");
             String newFileName = input.nextLine();
             newFileName = "data/"+newFileName;
+            System.out.println("New Game " + newFileName);
             makeBoard(newFileName);
             announce(null);
         }
@@ -113,12 +266,20 @@ public class SoltrChessModel extends Observable{
             makeBoard(currFile);
             announce(null);
         }
-        else if(choice.equals("hint")){}
-        else if(choice.equals("solve")){}
+        else if(choice.equals("hint")){ // need to write
+
+
+        }
+        else if(choice.equals("solve")){//need to write
+            Configuration currConfig = new SoltrChessModel(this);
+            Optional<Configuration> solution =  ;
+
+        }
         else if(choice.equals("quit")){System.out.println("The game has been quit"); System.exit(0);}
         else{
             System.out.println("Invalid Input value");
-            System.exit(1);
+            evaluate("move");
+
         }
 
     }
@@ -130,4 +291,29 @@ public class SoltrChessModel extends Observable{
 
 
 
+
+
+    @Override
+    public Collection<Configuration> getSuccessors() { // need to write
+        return null;
+    }
+
+    @Override
+    public boolean isValid() { // need to write
+        return true;
+    }
+
+    @Override
+    public boolean isGoal() {
+        int numberOfElements = 0;
+        for(int i = 0; i< BOARD_SIZE; i++){
+            for(int j = 0; j<BOARD_SIZE; j++){
+                if(!board[i][j].equals("-")){
+                    numberOfElements++;
+                }
+            }
+        }
+        if(numberOfElements == 1){return true;}
+        else{return false;}
+    }
 }
