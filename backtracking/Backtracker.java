@@ -6,6 +6,8 @@ package backtracking;/*
  * implement.
  */
 
+import model.SoltrChessModel;
+
 import java.lang.management.OperatingSystemMXBean;
 import java.util.List;
 import java.util.Optional;
@@ -34,6 +36,8 @@ public class Backtracker {
             return solutionStack;
         } else {
             for (Configuration child : config.getSuccessors()) {
+                System.out.println(config.getSuccessors().size());
+                ((SoltrChessModel)child).printBoard();
                 if (child.isValid()) {
                     Stack<Configuration> k  = solve(child);
                     if (k!=null) {
@@ -43,7 +47,7 @@ public class Backtracker {
                 }
             }
             // implicit backtracking happens here
-        } 
+        }
         return null;
     }
 
