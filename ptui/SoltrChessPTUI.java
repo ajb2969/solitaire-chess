@@ -26,7 +26,7 @@ public class SoltrChessPTUI implements Observer {
         Scanner input = new Scanner(System.in);
         for(; ;){
             System.out.print("[move,new,restart,hint,solve,quit]> ");
-            String choice = input.nextLine(); //if input is incorrect, reask again
+            String choice = input.nextLine(); //if input is incorrect, re ask again
             model.evaluate(choice);
         }
 

@@ -6,8 +6,10 @@ package backtracking;/*
  * implement.
  */
 
+import java.lang.management.OperatingSystemMXBean;
 import java.util.List;
 import java.util.Optional;
+import java.util.Stack;
 
 /**
  * This class represents the classic recursive backtracking algorithm.
@@ -25,21 +27,24 @@ public class Backtracker {
      * @param config A valid configuration
      * @return A solution config, or null if no solution
      */
-    public Optional<Configuration> solve(Configuration config) {
+    public Stack<Configuration> solve(Configuration config) {
+        Stack<Configuration> solutionStack = new Stack<Configuration>();
         if (config.isGoal()) {
-            return Optional.of(config);
+            solutionStack.push(config);
+            return solutionStack;
         } else {
             for (Configuration child : config.getSuccessors()) {
                 if (child.isValid()) {
-                    Optional<Configuration> sol = solve(child);
-                    if (sol.isPresent()) {
-                        return sol;
+                    Stack<Configuration> k  = solve(child);
+                    if (k!=null) {
+                        k.push(child);
+                        return k;
                     }
                 }
             }
             // implicit backtracking happens here
         } 
-        return Optional.empty();
+        return null;
     }
 
     /**
@@ -48,8 +53,23 @@ public class Backtracker {
      * @return a list of configurations to get to a goal configuration.
      *         If there are none, return null.
      */
-    public List< Configuration > solveWithPath( Configuration current ) {
-        // YOUR CODE HERE
+    public Stack< Configuration > solveWithPath( Configuration current ) {
+        Stack<Configuration> solutionStack = new Stack<Configuration>();
+        if (current.isGoal()) {
+            solutionStack.push(current);
+            return solutionStack;
+        } else {
+            for (Configuration child : current.getSuccessors()) {
+                if (child.isValid()) {
+                    Stack<Configuration> k  = solve(child);
+                    if (k!=null) {
+                        k.push(child);
+                        return k;
+                    }
+                }
+            }
+            // implicit backtracking happens here
+        }
         return null;
     }
 }
