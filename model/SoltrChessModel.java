@@ -16,11 +16,11 @@ public class SoltrChessModel extends Observable implements Configuration{
     private static final int BOARD_SIZE = 4;
     private int numOfChars;
     private static final int NUM_CARDS = BOARD_SIZE * BOARD_SIZE;
-    private static String [][]board;
+    private String[][] board;
     private String[][] previousBoard;
     private static String currFile;
     private Backtracker obj = new Backtracker();
-    private boolean valid;
+
 
     public SoltrChessModel(String fileName){
         currFile = fileName;
@@ -28,7 +28,6 @@ public class SoltrChessModel extends Observable implements Configuration{
         obj = new Backtracker();
         numOfChars = getNumOfChar(board);
         previousBoard = makeBoard(fileName);
-        valid = true;
     }
     public String[][] getBoard(){
         return board;
@@ -49,8 +48,8 @@ public class SoltrChessModel extends Observable implements Configuration{
                 this.board[i][j] = copy.board[i][j];
                 this.previousBoard[i][j] = copy.previousBoard[i][j];
             }
+
         }
-        valid = true;
     }
 
     public String[][] makeBoard(String fileName){
@@ -380,13 +379,10 @@ public class SoltrChessModel extends Observable implements Configuration{
     }
     @Override
     public boolean isValid() {
-        if(!valid)return false;
-
         int previousBoardChar = getNumOfChar(this.getPreviousBoard());
         String [][] currBoard = ((SoltrChessModel)this).getBoard();
         int currBoardChar = getNumOfChar(currBoard);
         if(previousBoardChar - currBoardChar != 1){
-            valid = false;
             return false;
         }
         else{
@@ -511,6 +507,7 @@ public class SoltrChessModel extends Observable implements Configuration{
         ArrayList<Configuration> configs = new ArrayList<Configuration>();
         Configuration mConfig = new SoltrChessModel(this);
         Configuration currConfig = mConfig;
+        //Configuration currConfig;
         for(Coordinates c: charPositions.keySet()){
             String thisChar = charPositions.get(c);
 
@@ -579,178 +576,192 @@ public class SoltrChessModel extends Observable implements Configuration{
                         configs.add(currConfig);
                         thisBoard[x][y] = thisChar;
                         thisBoard[x+i][y] = "-";
-
                     }
                 }
 
                 for(int i =1; i<2; i++){
-                    Configuration currConfig = mConfig;
                     String [][] thisBoard = ((SoltrChessModel)currConfig).getBoard();
                     int x = c.getX();int y = c.getY();
                     if((x-i>=0 )){
                         thisBoard[x][y] = "-";
                         thisBoard[x-i][y] = thisChar;
                         configs.add(currConfig);
+                        thisBoard[x][y] = thisChar;
+                        thisBoard[x-i][y] = "-";
                     }
                 }
 
                 for(int i =1; i<2; i++){
-                    Configuration currConfig = mConfig;
                     String [][] thisBoard = ((SoltrChessModel)currConfig).getBoard();
                     int x = c.getX();int y = c.getY();
                     if((y+i<BOARD_SIZE)){
                         thisBoard[x][y] = "-";
                         thisBoard[x][y+i] = thisChar;
                         configs.add(currConfig);
+                        thisBoard[x][y] = thisChar;
+                        thisBoard[x][y+i] = "-";
                     }
                 }
 
 
                 for(int i =1; i<2; i++){
-                    Configuration currConfig = mConfig;
                     String [][] thisBoard = ((SoltrChessModel)currConfig).getBoard();
                     int x = c.getX();int y = c.getY();
                     if((y-i>=0 )){
                         thisBoard[x][y] = "-";
                         thisBoard[x][y-i] = thisChar;
                         configs.add(currConfig);
+                        thisBoard[x][y] = thisChar;
+                        thisBoard[x][y-i] = "-";
                     }
                 }
 
                 for(int i =1; i<2; i++){
-                    Configuration currConfig = mConfig;
                     String [][] thisBoard = ((SoltrChessModel)currConfig).getBoard();
                     int x = c.getX();int y = c.getY();
                     if((x+i<BOARD_SIZE) && (y-i>=0 )){
                         thisBoard[x][y] = "-";
                         thisBoard[x+i][y-i] = thisChar;
                         configs.add(currConfig);
+                        thisBoard[x][y] = thisChar;
+                        thisBoard[x+i][y-i] = "-";
                     }
                 }
 
 
                 for(int i =1; i<2; i++){
-                    Configuration currConfig = mConfig;
                     String [][] thisBoard = ((SoltrChessModel)currConfig).getBoard();
                     int x = c.getX();int y = c.getY();
                     if((x-i>=0 ) && (y-i>=0 )){
                         thisBoard[x][y] = "-";
                         thisBoard[x-i][y-i] = thisChar;
                         configs.add(currConfig);
+                        thisBoard[x][y] = thisChar;
+                        thisBoard[x-i][y-i] = "-";
                     }
                 }
 
                 for(int i =1; i<2; i++){
-                    Configuration currConfig = mConfig;
                     String [][] thisBoard = ((SoltrChessModel)currConfig).getBoard();
                     int x = c.getX();int y = c.getY();
                     if((x+i<BOARD_SIZE) && ( y+i<BOARD_SIZE)){
                         thisBoard[x][y] = "-";
                         thisBoard[x+i][y+i] = thisChar;
                         configs.add(currConfig);
+                        thisBoard[x][y] = thisChar;
+                        thisBoard[x+i][y+i] = "-";
                     }
                 }
 
                 for(int i =1; i<2; i++){
-                    Configuration currConfig = mConfig;
                     String [][] thisBoard = ((SoltrChessModel)currConfig).getBoard();
                     int x = c.getX();int y = c.getY();
                     if((x-i>=0 ) && (y+i<BOARD_SIZE)){
                         thisBoard[x][y] = "-";
                         thisBoard[x-i][y+i] = thisChar;
                         configs.add(currConfig);
+                        thisBoard[x][y] = thisChar;
+                        thisBoard[x-i][y+i] = "-";
                     }
                 }
             }
             else if(thisChar.equals("Q")){
                 for(int i =1; i<BOARD_SIZE; i++){
-                    Configuration currConfig = mConfig;
                     String [][] thisBoard = ((SoltrChessModel)currConfig).getBoard();
                     int x = c.getX();int y = c.getY();
                     if((y+i<BOARD_SIZE)){
                         thisBoard[x][y] = "-";
                         thisBoard[x][y+i] = thisChar;
                         configs.add(currConfig);
+                        thisBoard[x][y] = thisChar;
+                        thisBoard[x][y+i] = "-";
                     }
                 }
 
                 for(int i =1; i<BOARD_SIZE; i++){
-                    Configuration currConfig = mConfig;
                     String [][] thisBoard = ((SoltrChessModel)currConfig).getBoard();
                     int x = c.getX();int y = c.getY();
                     if((y-i>=0)){
                         thisBoard[x][y] = "-";
                         thisBoard[x][y-i] = thisChar;
                         configs.add(currConfig);
+                        thisBoard[x][y] = thisChar;
+                        thisBoard[x][y-i] = "-";
                     }
                 }
 
                 for(int i =1; i<BOARD_SIZE; i++){
-                    Configuration currConfig = mConfig;
                     String [][] thisBoard = ((SoltrChessModel)currConfig).getBoard();
                     int x = c.getX();int y = c.getY();
                     if(( x+i<BOARD_SIZE) ){
                         thisBoard[x][y] = "-";
                         thisBoard[x+i][y] = thisChar;
                         configs.add(currConfig);
+                        thisBoard[x][y] = thisChar;
+                        thisBoard[x+i][y] = "-";
                     }
                 }
 
 
                 for(int i =1; i<BOARD_SIZE; i++){
-                    Configuration currConfig = mConfig;
                     String [][] thisBoard = ((SoltrChessModel)currConfig).getBoard();
                     int x = c.getX();int y = c.getY();
                     if((x-i>=0)){
                         thisBoard[x][y] = "-";
                         thisBoard[x-i][y] = thisChar;
                         configs.add(currConfig);
+                        thisBoard[x][y] = thisChar;
+                        thisBoard[x-i][y] = "-";
                     }
                 }
 
                 for(int i =1; i<BOARD_SIZE; i++){
-                    Configuration currConfig = mConfig;
                     String [][] thisBoard = ((SoltrChessModel)currConfig).getBoard();
                     int x = c.getX();int y = c.getY();
                     if((x+i<BOARD_SIZE) && (y+i<BOARD_SIZE)){
                         thisBoard[x][y] = "-";
                         thisBoard[x+i][y+i] = thisChar;
                         configs.add(currConfig);
+                        thisBoard[x][y] = thisChar;
+                        thisBoard[x+i][y+i] = "-";
                     }
                 }
 
 
                 for(int i =1; i<BOARD_SIZE; i++){
-                    Configuration currConfig = mConfig;
                     String [][] thisBoard = ((SoltrChessModel)currConfig).getBoard();
                     int x = c.getX();int y = c.getY();
                     if((x+i<BOARD_SIZE) && (y-i>=0 )){
                         thisBoard[x][y] = "-";
                         thisBoard[x+i][y-i] = thisChar;
                         configs.add(currConfig);
+                        thisBoard[x][y] = thisChar;
+                        thisBoard[x+i][y-i] = "-";
                     }
                 }
 
                 for(int i =1; i<BOARD_SIZE; i++){
-                    Configuration currConfig = mConfig;
                     String [][] thisBoard = ((SoltrChessModel)currConfig).getBoard();
                     int x = c.getX();int y = c.getY();
                     if((x-i>=0 ) && (y+i<BOARD_SIZE)){
                         thisBoard[x][y] = "-";
                         thisBoard[x-i][y+i] = thisChar;
                         configs.add(currConfig);
+                        thisBoard[x][y] = thisChar;
+                        thisBoard[x-i][y+i] = "-";
                     }
                 }
 
 
                 for(int i =1; i<BOARD_SIZE; i++){
-                    Configuration currConfig = mConfig;
                     String [][] thisBoard = ((SoltrChessModel)currConfig).getBoard();
                     int x = c.getX();int y = c.getY();
                     if((x-i>=0 ) && (y-i>=0 )){
                         thisBoard[x][y] = "-";
                         thisBoard[x-i][y-i] = thisChar;
                         configs.add(currConfig);
+                        thisBoard[x][y] = thisChar;
+                        thisBoard[x-i][y-i] = "-";
                     }
                 }
 
@@ -758,147 +769,158 @@ public class SoltrChessModel extends Observable implements Configuration{
             }
             else if(thisChar.equals("R")){
                 for(int i =1; i<BOARD_SIZE; i++){
-                    Configuration currConfig = mConfig;
                     String [][] thisBoard = ((SoltrChessModel)currConfig).getBoard();
                     int x = c.getX();int y = c.getY();
                     if( (y+i<BOARD_SIZE)){
                         thisBoard[x][y] = "-";
                         thisBoard[x][y+i] = thisChar;
                         configs.add(currConfig);
+                        thisBoard[x][y] = thisChar;
+                        thisBoard[x][y+i] = "-";
                     }
                 }
 
                 for(int i =1; i<BOARD_SIZE; i++){
-                    Configuration currConfig = mConfig;
                     String [][] thisBoard = ((SoltrChessModel)currConfig).getBoard();
                     int x = c.getX();int y = c.getY();
                     if( y-i>=0 ){
                         thisBoard[x][y] = "-";
                         thisBoard[x][y-i] = thisChar;
                         configs.add(currConfig);
+                        thisBoard[x][y] = thisChar;
+                        thisBoard[x][y-i] = "-";
                     }
                 }
 
                 for(int i =1; i<BOARD_SIZE; i++){
-                    Configuration currConfig = mConfig;
                     String [][] thisBoard = ((SoltrChessModel)currConfig).getBoard();
                     int x = c.getX();int y = c.getY();
                     if((x+i<BOARD_SIZE)){
                         thisBoard[x][y] = "-";
                         thisBoard[x+i][y] = thisChar;
                         configs.add(currConfig);
+                        thisBoard[x][y] = thisChar;
+                        thisBoard[x+i][y] = "-";
                     }
                 }
 
                 for(int i =1; i<BOARD_SIZE; i++){
-                    Configuration currConfig = mConfig;
                     String [][] thisBoard = ((SoltrChessModel)currConfig).getBoard();
                     int x = c.getX();int y = c.getY();
                     if(x-i>=0 ){
                         thisBoard[x][y] = "-";
                         thisBoard[x-i][y] = thisChar;
                         configs.add(currConfig);
+                        thisBoard[x][y] = thisChar;
+                        thisBoard[x-i][y] = "-";
                     }
                 }
             }
             else if(thisChar.equals("N")){
                 for(int i =0; i<1; i++){
-                    Configuration currConfig = mConfig;
                     String [][] thisBoard = ((SoltrChessModel)currConfig).getBoard();
                     int x = c.getX();int y = c.getY();
                     if((x>=0 && x+2<BOARD_SIZE) && (y-1>0 && y+i<BOARD_SIZE)){
                         thisBoard[x][y] = "-";
                         thisBoard[x+2][y-1] = thisChar;
                         configs.add(currConfig);
+                        thisBoard[x][y] = thisChar;
+                        thisBoard[x+2][y-1] = "-";
                     }
                 }
 
                 for(int i =0; i<1; i++){
-                    Configuration currConfig = mConfig;
                     String [][] thisBoard = ((SoltrChessModel)currConfig).getBoard();
                     int x = c.getX();int y = c.getY();
                     if((x>=0 && x+2<BOARD_SIZE) && (y>=0 && y+1<BOARD_SIZE)){
                         thisBoard[x][y] = "-";
                         thisBoard[x+2][y+1] = thisChar;
                         configs.add(currConfig);
+                        thisBoard[x][y] = thisChar;
+                        thisBoard[x+2][y+1] = "-";
                     }
                 }
 
                 for(int i =0; i<1; i++){
-                    Configuration currConfig = mConfig;
                     String [][] thisBoard = ((SoltrChessModel)currConfig).getBoard();
                     int x = c.getX();int y = c.getY();
                     if((x>=0 && x+1<BOARD_SIZE) && (y-2>=0 && y<BOARD_SIZE)){
                         thisBoard[x][y] = "-";
                         thisBoard[x+1][y-2] = thisChar;
                         configs.add(currConfig);
+                        thisBoard[x][y] = thisChar;
+                        thisBoard[x+1][y-2] = "-";
                     }
                 }
 
 
                 for(int i =0; i<1; i++){
-                    Configuration currConfig = mConfig;
                     String [][] thisBoard = ((SoltrChessModel)currConfig).getBoard();
                     int x = c.getX();int y = c.getY();
                     if((x>=0 && x+1<BOARD_SIZE) && (y>=0 && y+2<BOARD_SIZE)){
                         thisBoard[x][y] = "-";
                         thisBoard[x+1][y+2] = thisChar;
                         configs.add(currConfig);
+                        thisBoard[x][y] = thisChar;
+                        thisBoard[x+1][y+2] = "-";
                     }
                 }
 
 
                 for(int i =0; i<1; i++){
-                    Configuration currConfig = mConfig;
                     String [][] thisBoard = ((SoltrChessModel)currConfig).getBoard();
                     int x = c.getX();int y = c.getY();
                     if((x-2>=0 && x<BOARD_SIZE) && (y>=0 && y+1<BOARD_SIZE)){
                         thisBoard[x][y] = "-";
                         thisBoard[x-2][y+1] = thisChar;
                         configs.add(currConfig);
+                        thisBoard[x][y] = thisChar;
+                        thisBoard[x-2][y+1] = "-";
                     }
                 }
 
 
                 for(int i =0; i<1; i++){
-                    Configuration currConfig = mConfig;
                     String [][] thisBoard = ((SoltrChessModel)currConfig).getBoard();
                     int x = c.getX();int y = c.getY();
                     if((x-2>=0 && x<BOARD_SIZE) && (y-1>=0 && y<BOARD_SIZE)){
                         thisBoard[x][y] = "-";
                         thisBoard[x-2][y-1] = thisChar;
                         configs.add(currConfig);
+                        thisBoard[x][y] = thisChar;
+                        thisBoard[x-2][y-1] = "-";
                     }
                 }
 
 
                 for(int i =0; i<1; i++){
-                    Configuration currConfig = mConfig;
                     String [][] thisBoard = ((SoltrChessModel)currConfig).getBoard();
                     int x = c.getX();int y = c.getY();
                     if((x-1>=0 && x<BOARD_SIZE) && (y>=0 && y+2<BOARD_SIZE)){
                         thisBoard[x][y] = "-";
                         thisBoard[x-1][y+2] = thisChar;
                         configs.add(currConfig);
+                        thisBoard[x][y] = thisChar;
+                        thisBoard[x-1][y+2] = "-";
                     }
                 }
 
 
                 for(int i =0; i<1; i++){
-                    Configuration currConfig = mConfig;
                     String [][] thisBoard = ((SoltrChessModel)currConfig).getBoard();
                     int x = c.getX();int y = c.getY();
                     if((x-1>=0 && x<BOARD_SIZE) && (y-2>=0 && y<BOARD_SIZE)){
                         thisBoard[x][y] = "-";
                         thisBoard[x-1][y-2] = thisChar;
                         configs.add(currConfig);
+                        thisBoard[x][y] = thisChar;
+                        thisBoard[x-1][y-2] = "-";
                     }
                 }
             }
             else{//Pawn
 
                 for(int i =0; i<1; i++){
-                    Configuration currConfig = mConfig;
                     String [][] thisBoard = ((SoltrChessModel)currConfig).getBoard();
                     int x = c.getX();int y = c.getY();
                     if((x+i>=0 && x+i<BOARD_SIZE) && (y+i>=0 && y+i<BOARD_SIZE)){
@@ -906,12 +928,13 @@ public class SoltrChessModel extends Observable implements Configuration{
                             thisBoard[x][y] = "-";
                             thisBoard[x-1][y-1] = thisChar;
                             configs.add(currConfig);
+                            thisBoard[x][y] = thisChar;
+                            thisBoard[x-1][y-1] = "-";
                         }
                     }
                 }
 
                 for(int i =0; i<1; i++){
-                    Configuration currConfig = mConfig;
                     String [][] thisBoard = ((SoltrChessModel)currConfig).getBoard();
                     int x = c.getX();int y = c.getY();
                     if((x+i>=0 && x+i<BOARD_SIZE) && (y+i>=0 && y+i<BOARD_SIZE)){
@@ -919,13 +942,14 @@ public class SoltrChessModel extends Observable implements Configuration{
                             thisBoard[x][y] = "-";
                             thisBoard[x-1][y+1] = thisChar;
                             configs.add(currConfig);
+                            thisBoard[x][y] = thisChar;
+                            thisBoard[x-1][y+1] = "-";
                         }
                     }
                 }
 
 
                 for(int i =0; i<1; i++){
-                    Configuration currConfig = mConfig;
                     String [][] thisBoard = ((SoltrChessModel)currConfig).getBoard();
                     int x = c.getX();int y = c.getY();
                     if((x+i>=0 && x+i<BOARD_SIZE) && (y+i>=0 && y+i<BOARD_SIZE)){
@@ -938,7 +962,6 @@ public class SoltrChessModel extends Observable implements Configuration{
                 }
 
                 for(int i =0; i<1; i++){
-                    Configuration currConfig = mConfig;
                     String [][] thisBoard = ((SoltrChessModel)currConfig).getBoard();
                     int x = c.getX();int y = c.getY();
                     if((x+i>=0 && x+i<BOARD_SIZE) && (y+i>=0 && y+i<BOARD_SIZE)){
