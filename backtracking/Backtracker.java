@@ -6,6 +6,8 @@ package backtracking;/*
  * implement.
  */
 
+import model.SoltrChessModel;
+
 import java.util.List;
 import java.util.Optional;
 

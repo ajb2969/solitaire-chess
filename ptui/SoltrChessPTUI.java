@@ -40,7 +40,6 @@ public class SoltrChessPTUI implements Observer {
     @Override
     //
     public void update(Observable o, Object arg) {
-
         model.printBoard();
         if(model.isGoal()){
             System.out.println("You won, Congrats!!");
