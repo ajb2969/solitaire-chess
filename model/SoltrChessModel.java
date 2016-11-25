@@ -13,26 +13,34 @@ import java.util.Observable;
  */
 public class SoltrChessModel extends Observable implements Configuration{
     private static final int BOARD_SIZE = 4;
-    private static final int NUM_CARDS = BOARD_SIZE * BOARD_SIZE;
     private static String [][]board;
     private static String currFile;
     private Backtracker obj = new Backtracker();
+    private static ArrayList<Integer> numChar = new ArrayList<Integer>();
 
 
     public String[][] getBoard(){return board;}
 
     public SoltrChessModel(String fileName){
         board = makeBoard(fileName);
+        numChar.add(getNumChar(board));
+    }
+    public int getNumChar(String [][] b){
+        int chr = 0;
+        for(int i = 0; i<BOARD_SIZE; i++){
+            for(int j = 0; j<BOARD_SIZE; j++){
+              if(b[i][j]!= "-"){chr++;}
+            }
+        }
+        return chr;
     }
 
     public SoltrChessModel(SoltrChessModel copy){
         String [][] copyBoard = copy.getBoard();
+        String [][] thisBoard = this.getBoard();
         this.currFile = copy.currFile;
-        for(int i = 0; i<BOARD_SIZE; i++){
-            for(int j = 0; j<BOARD_SIZE; j++){
-                this.board[i][j] = copyBoard[i][j];
-            }
-        }
+        for(int row = 0; row<BOARD_SIZE; row++){System.arraycopy(copyBoard[row],0, thisBoard[row], 0, BOARD_SIZE);}
+        this.numChar = new ArrayList<>(copy.numChar);
     }
 
 
@@ -70,10 +78,10 @@ public class SoltrChessModel extends Observable implements Configuration{
         return board;
     }
 
-    public void printBoard(){
+    public void printBoard(String [][] b){
         for(int i = 0; i<BOARD_SIZE; i++){
             for(int j = 0; j<BOARD_SIZE; j++){
-                System.out.print(board[i][j] + " ");
+                System.out.print(b[i][j] + " ");
             }
             System.out.println();
         }
@@ -282,6 +290,7 @@ public class SoltrChessModel extends Observable implements Configuration{
              }
         else if(choice.equals("solve")){//uses backtracking
             obj.solve(this);
+
         }
         else if(choice.equals("quit")){System.out.println("The game has been quit"); System.exit(0);}
         else{
@@ -295,6 +304,27 @@ public class SoltrChessModel extends Observable implements Configuration{
         setChanged();
         notifyObservers(arg);
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     @Override
@@ -323,12 +353,8 @@ public class SoltrChessModel extends Observable implements Configuration{
                 for(int i = 0; i<possibilities.size(); i++){possibleConfigs.add(possibilities.get(i));}
             }
         }
-        for(Configuration c: possibleConfigs){
-            ((SoltrChessModel)c).printBoard();
-        }
-        Scanner input = new Scanner(System.in);
-        int x = input.nextInt();
-        return null;
+
+        return possibleConfigs;
     }
 
     public void modifyBoard(int r, int c, String symbol){board[r][c] = symbol;}
@@ -345,7 +371,7 @@ public class SoltrChessModel extends Observable implements Configuration{
         }
         for(int i = 0; i < allMovePossibilities.size(); i++){//prunes to eliminate all invalid moves
             Coordinates currObject = allMovePossibilities.get(i);
-            if(!((currObject.getX() < 0)||(currObject.getY() < 0)||(currObject.getX() >= BOARD_SIZE)||(currObject.getY() >= BOARD_SIZE))){
+            if((!((currObject.getX() < 0)||(currObject.getY() < 0)||(currObject.getX() >= BOARD_SIZE)||(currObject.getY() >= BOARD_SIZE))) && (!board[currObject.getX()][currObject.getY()].equals("-"))){
                 validPossibilities.add(currObject);
             }
         }
@@ -364,8 +390,10 @@ public class SoltrChessModel extends Observable implements Configuration{
             ((SoltrChessModel)curr).modifyBoard(x,y,"-");
             ((SoltrChessModel)curr).modifyBoard(thisCoor.getX(), thisCoor.getY(), "B");
             possibleConfigs.add(curr);
-            ((SoltrChessModel)curr).modifyBoard(x,y,"B");
-            ((SoltrChessModel)curr).modifyBoard(thisCoor.getX(), thisCoor.getY(), taken);
+            thisBoard = ((SoltrChessModel)curr).getBoard();
+            numChar.add(getNumChar(thisBoard));
+//            ((SoltrChessModel)curr).modifyBoard(x,y,"B");
+//            ((SoltrChessModel)curr).modifyBoard(thisCoor.getX(), thisCoor.getY(), taken);
 
         }
         return possibleConfigs;
@@ -398,7 +426,7 @@ public class SoltrChessModel extends Observable implements Configuration{
 
         for(int i = 0; i<movePossibilities.size(); i++){
             Coordinates currObject = movePossibilities.get(i);
-            if(((currObject.getX() >= 0) && currObject.getX()<BOARD_SIZE) && (currObject.getY()>=0 && currObject.getY()<BOARD_SIZE)){
+            if(((currObject.getX() >= 0) && currObject.getX()<BOARD_SIZE) && (currObject.getY()>=0 && currObject.getY()<BOARD_SIZE)&& (!board[currObject.getX()][currObject.getY()].equals("-"))){
                 validPossibilities.add(currObject);
             }
         }
@@ -418,8 +446,10 @@ public class SoltrChessModel extends Observable implements Configuration{
             ((SoltrChessModel)curr).modifyBoard(x,y,"-");
             ((SoltrChessModel)curr).modifyBoard(thisCoor.getX(), thisCoor.getY(), "P");
             possibleConfigs.add(curr);
-            ((SoltrChessModel)curr).modifyBoard(x,y,"P");
-            ((SoltrChessModel)curr).modifyBoard(thisCoor.getX(), thisCoor.getY(), taken);
+            thisBoard = ((SoltrChessModel)curr).getBoard();
+            this.numChar.add(getNumChar(thisBoard));
+//            ((SoltrChessModel)curr).modifyBoard(x,y,"P");
+//            ((SoltrChessModel)curr).modifyBoard(thisCoor.getX(), thisCoor.getY(), taken);
         }
         return possibleConfigs;
 
@@ -456,7 +486,7 @@ public class SoltrChessModel extends Observable implements Configuration{
         allMovePossibilities.add(new Coordinates(x - 1,y - 2));
         for(int i=0; i<allMovePossibilities.size(); i++){
             Coordinates currObject = allMovePossibilities.get(i);
-            if(((currObject.getX() >= 0) && currObject.getX()<BOARD_SIZE) && (currObject.getY()>=0 && currObject.getY()<BOARD_SIZE)){
+            if(((currObject.getX() >= 0) && currObject.getX()<BOARD_SIZE) && (currObject.getY()>=0 && currObject.getY()<BOARD_SIZE) && (!board[currObject.getX()][currObject.getY()].equals("-"))){
                 validPossibilities.add(currObject);
             }
 
@@ -476,10 +506,12 @@ public class SoltrChessModel extends Observable implements Configuration{
             ((SoltrChessModel)curr).modifyBoard(x,y,"-");
             ((SoltrChessModel)curr).modifyBoard(thisCoor.getX(), thisCoor.getY(), "N");
             possibleConfigs.add(curr);
-            ((SoltrChessModel)curr).modifyBoard(x,y,"N");
-            ((SoltrChessModel)curr).modifyBoard(thisCoor.getX(), thisCoor.getY(), taken);
+            thisBoard = ((SoltrChessModel)curr).getBoard();
+            numChar.add(getNumChar(thisBoard));
+
+//            ((SoltrChessModel)curr).modifyBoard(x,y,"N");
+//            ((SoltrChessModel)curr).modifyBoard(thisCoor.getX(), thisCoor.getY(), taken);
         }
-        System.out.println("Knight Configs");
         return possibleConfigs;
     }
 
@@ -487,7 +519,7 @@ public class SoltrChessModel extends Observable implements Configuration{
 
     @Override
     public boolean isValid() {
-        return false;
+        return true;
     }
 
     @Override
