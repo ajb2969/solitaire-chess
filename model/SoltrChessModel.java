@@ -282,8 +282,15 @@ public class SoltrChessModel extends Observable implements Configuration{
             List<Configuration> a = obj.solveWithPath(this);
             if(a != null){
                 a.remove(0);
-                
-
+                System.out.println("Hint:");
+                System.out.println(a.get(0).toString());
+                String [][] b = ((SoltrChessModel)a.get(0)).board;
+                for(int i = 0; i<BOARD_SIZE; i++){
+                    System.arraycopy(b[i],0,board[i],0, BOARD_SIZE);
+                }
+                if(getNumChar(board) == 1){
+                    System.out.println("You've won, Congratulations");
+                }
             }
             else{
                 System.out.println("There is no hint");
@@ -297,6 +304,8 @@ public class SoltrChessModel extends Observable implements Configuration{
                     System.out.println("Step " + (i+1) + ": ");
                     System.out.println(a.get(i).toString());
                 }
+                System.out.println("You won, Congratulations!");
+
             }
             else{
                 System.out.println("There is no solution");
@@ -362,10 +371,124 @@ public class SoltrChessModel extends Observable implements Configuration{
                 ArrayList<Configuration> possibilities = getPossibleConfigsKnight(c.getX(),c.getY());
                 for(int i = 0; i<possibilities.size(); i++){possibleConfigs.add(possibilities.get(i));}
             }
+            else if(piecesOnBoard.get(c).equals("K")){
+                ArrayList<Configuration> possibilities = getPossibleConfigsKing(c.getX(),c.getY());
+                for(int i = 0; i<possibilities.size(); i++){possibleConfigs.add(possibilities.get(i));}
+            }
+            else if(piecesOnBoard.get(c).equals("Q")){
+                ArrayList<Configuration> possibilities = getPossibleConfigsQueen(c.getX(),c.getY());
+                for(int i = 0; i<possibilities.size(); i++){possibleConfigs.add(possibilities.get(i));}
+            }
+            else{//Rook
+                    ArrayList<Configuration> possibilities = getPossibleConfigsRook(c.getX(),c.getY());
+                    for(int i = 0; i<possibilities.size(); i++){possibleConfigs.add(possibilities.get(i));}
+            }
+
+
+
+
+
+
         }
 
         return possibleConfigs;
     }
+
+
+
+    public ArrayList<Configuration> getPossibleConfigsKing(int x, int y){
+        ArrayList<Coordinates> allMovePossibilities = new ArrayList<Coordinates>();
+        ArrayList<Coordinates> validPossibilities = new ArrayList<Coordinates>();
+        ArrayList<Configuration> possibleConfigs = new ArrayList<Configuration>();
+        allMovePossibilities.add(new Coordinates(x+1,y));
+        allMovePossibilities.add(new Coordinates(x-1,y));
+        allMovePossibilities.add(new Coordinates(x,y+1));
+        allMovePossibilities.add(new Coordinates(x,y-1));
+        allMovePossibilities.add(new Coordinates(x+1,y-1));
+        allMovePossibilities.add(new Coordinates(x-1,y-1));
+        allMovePossibilities.add(new Coordinates(x+1,y+1));
+        allMovePossibilities.add(new Coordinates(x-1,y+1));
+
+        for(int i = 0; i < allMovePossibilities.size(); i++){
+            Coordinates currObject = allMovePossibilities.get(i);
+            if(!((currObject.getX() < 0)||(currObject.getY() < 0)||(currObject.getX() >= BOARD_SIZE)||(currObject.getY() >= BOARD_SIZE))){
+                validPossibilities.add(currObject);
+            }
+        }
+
+        for(int i = 0; i<validPossibilities.size(); i++){//calls copy constructor, gets that coordinate and moves the piece, adds the configuration
+            SoltrChessModel curr = new SoltrChessModel(this);
+            Coordinates thisCoor = validPossibilities.get(i);
+            curr.board[x][y]= "-";
+            curr.board[thisCoor.getX()][thisCoor.getY()] = "K";
+            possibleConfigs.add(curr);
+        }
+        return possibleConfigs;
+    }
+
+    public ArrayList<Configuration> getPossibleConfigsQueen(int x, int y){
+        ArrayList<Coordinates> allMovePossibilities = new ArrayList<Coordinates>();
+        ArrayList<Coordinates> validPossibilities = new ArrayList<Coordinates>();
+        ArrayList<Configuration> possibleConfigs = new ArrayList<Configuration>();
+        for(int i = 1; i<BOARD_SIZE; i++){
+            allMovePossibilities.add(new Coordinates(x,y+i));
+            allMovePossibilities.add(new Coordinates(x,y-i));
+            allMovePossibilities.add(new Coordinates(x+i,y));
+            allMovePossibilities.add(new Coordinates(x-i,y));
+            allMovePossibilities.add(new Coordinates(x+i,y+i));
+            allMovePossibilities.add(new Coordinates(x+i,y-i));
+            allMovePossibilities.add(new Coordinates(x-i,y+i));
+            allMovePossibilities.add(new Coordinates(x-i,y-i));
+        }
+        for(int i=0; i<allMovePossibilities.size(); i++){
+            Coordinates currObject = allMovePossibilities.get(i);
+            if(((currObject.getX() >= 0) && currObject.getX()<BOARD_SIZE) && (currObject.getY()>=0 && currObject.getY()<BOARD_SIZE)){
+                validPossibilities.add(currObject);
+            }
+        }
+        for(int i = 0; i<validPossibilities.size(); i++){//calls copy constructor, gets that coordinate and moves the piece, adds the configuration
+            SoltrChessModel curr = new SoltrChessModel(this);
+            Coordinates thisCoor = validPossibilities.get(i);
+            curr.board[x][y]= "-";
+            curr.board[thisCoor.getX()][thisCoor.getY()] = "Q";
+            possibleConfigs.add(curr);
+        }
+        return possibleConfigs;
+    }
+
+    public ArrayList<Configuration> getPossibleConfigsRook(int x, int y){
+        ArrayList<Coordinates> allMovePossibilities = new ArrayList<Coordinates>();
+        ArrayList<Coordinates> validPossibilities = new ArrayList<Coordinates>();
+        ArrayList<Configuration> possibleConfigs = new ArrayList<Configuration>();
+        for(int i = 1; i<BOARD_SIZE; i++){
+            allMovePossibilities.add(new Coordinates(x, y+i));
+            allMovePossibilities.add(new Coordinates(x, y-i));
+            allMovePossibilities.add(new Coordinates(x+i, y));
+            allMovePossibilities.add(new Coordinates(x-i, y));
+        }
+        for(int i=0; i<allMovePossibilities.size(); i++){
+            Coordinates currObject = allMovePossibilities.get(i);
+            if(((currObject.getX() >= 0) && currObject.getX()<BOARD_SIZE) && (currObject.getY()>=0 && currObject.getY()<BOARD_SIZE)){
+                validPossibilities.add(currObject);
+            }
+        }
+        for(int i = 0; i<validPossibilities.size(); i++){//calls copy constructor, gets that coordinate and moves the piece, adds the configuration
+            SoltrChessModel curr = new SoltrChessModel(this);
+            Coordinates thisCoor = validPossibilities.get(i);
+            curr.board[x][y]= "-";
+            curr.board[thisCoor.getX()][thisCoor.getY()] = "R";
+            possibleConfigs.add(curr);
+        }
+        return possibleConfigs;
+    }
+
+
+
+
+
+
+
+
 
 
     public ArrayList<Configuration> getPossibleConfigsBishop(int x, int y){
@@ -456,7 +579,6 @@ public class SoltrChessModel extends Observable implements Configuration{
         }
         return possibleConfigs;
     }
-
 
 
     @Override
