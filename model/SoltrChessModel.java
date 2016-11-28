@@ -13,37 +13,33 @@ import java.util.Observable;
  */
 public class SoltrChessModel extends Observable implements Configuration{
     private static final int BOARD_SIZE = 4;
-    private static String [][]board;
+    private String [][]board;
     private static String currFile;
     private Backtracker obj = new Backtracker();
-    private static ArrayList<Integer> numChar = new ArrayList<Integer>();
+    private String [][] previousBoard = new String[BOARD_SIZE][BOARD_SIZE];
 
-
-    public String[][] getBoard(){return board;}
 
     public SoltrChessModel(String fileName){
         board = makeBoard(fileName);
-        numChar.add(getNumChar(board));
     }
     public int getNumChar(String [][] b){
         int chr = 0;
         for(int i = 0; i<BOARD_SIZE; i++){
             for(int j = 0; j<BOARD_SIZE; j++){
-              if(b[i][j]!= "-"){chr++;}
+              if(!(b[i][j].equals("-"))){chr++;}
             }
         }
         return chr;
     }
 
     public SoltrChessModel(SoltrChessModel copy){
-        String [][] copyBoard = copy.getBoard();
-        String [][] thisBoard = this.getBoard();
+        board = new String [BOARD_SIZE][BOARD_SIZE];
         this.currFile = copy.currFile;
-        for(int row = 0; row<BOARD_SIZE; row++){System.arraycopy(copyBoard[row],0, thisBoard[row], 0, BOARD_SIZE);}
-        this.numChar = new ArrayList<>(copy.numChar);
+        for(int row = 0; row<BOARD_SIZE; row++){
+            System.arraycopy(copy.board[row],0, this.board[row], 0, BOARD_SIZE);
+            System.arraycopy(copy.board[row],0, previousBoard[row],0,BOARD_SIZE);
+        }
     }
-
-
 
     public String[][] makeBoard(String fileName){
         board = new String [BOARD_SIZE][BOARD_SIZE];
@@ -78,13 +74,8 @@ public class SoltrChessModel extends Observable implements Configuration{
         return board;
     }
 
-    public void printBoard(String [][] b){
-        for(int i = 0; i<BOARD_SIZE; i++){
-            for(int j = 0; j<BOARD_SIZE; j++){
-                System.out.print(b[i][j] + " ");
-            }
-            System.out.println();
-        }
+    public void printBoard(){
+        System.out.println(toString());
     }
 
     public void evaluateMove(int sR,int sC,int dR,int dC) {
@@ -286,11 +277,30 @@ public class SoltrChessModel extends Observable implements Configuration{
             makeBoard(currFile);
             announce(null);
         }
-        else if(choice.equals("hint")){//uses backtracking
-             }
-        else if(choice.equals("solve")){//uses backtracking
-            obj.solve(this);
+        else if(choice.equals("hint"))//uses backtracking
+        {
+            List<Configuration> a = obj.solveWithPath(this);
+            if(a != null){
+                a.remove(0);
+                
 
+            }
+            else{
+                System.out.println("There is no hint");
+            }
+        }
+        else if(choice.equals("solve"))//uses backtracking
+        {
+            List<Configuration> a = obj.solveWithPath(this);
+            if(a != null){
+                for(int i =0; i<a.size();i++){
+                    System.out.println("Step " + (i+1) + ": ");
+                    System.out.println(a.get(i).toString());
+                }
+            }
+            else{
+                System.out.println("There is no solution");
+            }
         }
         else if(choice.equals("quit")){System.out.println("The game has been quit"); System.exit(0);}
         else{
@@ -333,7 +343,7 @@ public class SoltrChessModel extends Observable implements Configuration{
         ArrayList<Configuration> possibleConfigs = new ArrayList<Configuration>();
         for(int i = 0; i<BOARD_SIZE; i++){
             for(int j = 0; j<BOARD_SIZE; j++){
-                if(board[i][j]!= "-"){
+                if(!(board[i][j].equals("-"))){
                     piecesOnBoard.put(new Coordinates(i,j), board[i][j]);//builds hashmap, puts each piece and it's coordinate in hashmap
                 }
             }
@@ -357,7 +367,6 @@ public class SoltrChessModel extends Observable implements Configuration{
         return possibleConfigs;
     }
 
-    public void modifyBoard(int r, int c, String symbol){board[r][c] = symbol;}
 
     public ArrayList<Configuration> getPossibleConfigsBishop(int x, int y){
         ArrayList<Configuration> possibleConfigs = new ArrayList<Configuration>();
@@ -371,43 +380,19 @@ public class SoltrChessModel extends Observable implements Configuration{
         }
         for(int i = 0; i < allMovePossibilities.size(); i++){//prunes to eliminate all invalid moves
             Coordinates currObject = allMovePossibilities.get(i);
-            if((!((currObject.getX() < 0)||(currObject.getY() < 0)||(currObject.getX() >= BOARD_SIZE)||(currObject.getY() >= BOARD_SIZE))) && (!board[currObject.getX()][currObject.getY()].equals("-"))){
+            if((!((currObject.getX() < 0)||(currObject.getY() < 0)||(currObject.getX() >= BOARD_SIZE)||(currObject.getY() >= BOARD_SIZE)))){
                 validPossibilities.add(currObject);
             }
         }
         for(int i = 0; i<validPossibilities.size(); i++){//calls copy constructor, gets that coordinate and moves the piece, adds the configuration
-            Configuration curr = new SoltrChessModel(this);
+            SoltrChessModel curr = new SoltrChessModel(this);
             Coordinates thisCoor = validPossibilities.get(i);
-            String [][]thisBoard = ((SoltrChessModel)curr).getBoard();
-            String taken;
-            if(!(thisBoard[thisCoor.getX()][thisCoor.getY()].equals("-"))){
-                taken = thisBoard[thisCoor.getX()][thisCoor.getY()];
-            }
-            else{
-                taken = "-";
-            }
-
-            ((SoltrChessModel)curr).modifyBoard(x,y,"-");
-            ((SoltrChessModel)curr).modifyBoard(thisCoor.getX(), thisCoor.getY(), "B");
+            curr.board[x][y]= "-";
+            curr.board[thisCoor.getX()][thisCoor.getY()] = "B";
             possibleConfigs.add(curr);
-            thisBoard = ((SoltrChessModel)curr).getBoard();
-            numChar.add(getNumChar(thisBoard));
-//            ((SoltrChessModel)curr).modifyBoard(x,y,"B");
-//            ((SoltrChessModel)curr).modifyBoard(thisCoor.getX(), thisCoor.getY(), taken);
-
         }
         return possibleConfigs;
     }
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -426,50 +411,21 @@ public class SoltrChessModel extends Observable implements Configuration{
 
         for(int i = 0; i<movePossibilities.size(); i++){
             Coordinates currObject = movePossibilities.get(i);
-            if(((currObject.getX() >= 0) && currObject.getX()<BOARD_SIZE) && (currObject.getY()>=0 && currObject.getY()<BOARD_SIZE)&& (!board[currObject.getX()][currObject.getY()].equals("-"))){
+            if(((currObject.getX() >= 0) && currObject.getX()<BOARD_SIZE) && (currObject.getY()>=0 && currObject.getY()<BOARD_SIZE)){
                 validPossibilities.add(currObject);
             }
         }
 
         for(int i = 0; i<validPossibilities.size(); i++){//calls copy constructor, gets that coordinate and moves the piece, adds the configuration
-            Configuration curr = new SoltrChessModel(this);
+            SoltrChessModel curr = new SoltrChessModel(this);
             Coordinates thisCoor = validPossibilities.get(i);
-            String [][]thisBoard = ((SoltrChessModel)curr).getBoard();
-            String taken;
-            if(!(thisBoard[thisCoor.getX()][thisCoor.getY()].equals("-"))){
-                taken = thisBoard[thisCoor.getX()][thisCoor.getY()];
-            }
-            else{
-                taken = "-";
-            }
-
-            ((SoltrChessModel)curr).modifyBoard(x,y,"-");
-            ((SoltrChessModel)curr).modifyBoard(thisCoor.getX(), thisCoor.getY(), "P");
+            curr.board[x][y] = "-";
+            curr.board[thisCoor.getX()][thisCoor.getY()] = "P";
             possibleConfigs.add(curr);
-            thisBoard = ((SoltrChessModel)curr).getBoard();
-            this.numChar.add(getNumChar(thisBoard));
-//            ((SoltrChessModel)curr).modifyBoard(x,y,"P");
-//            ((SoltrChessModel)curr).modifyBoard(thisCoor.getX(), thisCoor.getY(), taken);
         }
         return possibleConfigs;
 
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     public ArrayList<Configuration> getPossibleConfigsKnight(int x, int y){
@@ -486,31 +442,17 @@ public class SoltrChessModel extends Observable implements Configuration{
         allMovePossibilities.add(new Coordinates(x - 1,y - 2));
         for(int i=0; i<allMovePossibilities.size(); i++){
             Coordinates currObject = allMovePossibilities.get(i);
-            if(((currObject.getX() >= 0) && currObject.getX()<BOARD_SIZE) && (currObject.getY()>=0 && currObject.getY()<BOARD_SIZE) && (!board[currObject.getX()][currObject.getY()].equals("-"))){
+            if(((currObject.getX() >= 0) && currObject.getX()<BOARD_SIZE) && (currObject.getY()>=0 && currObject.getY()<BOARD_SIZE)){
                 validPossibilities.add(currObject);
             }
 
         }
         for(int i = 0; i<validPossibilities.size(); i++){//calls copy constructor, gets that coordinate and moves the piece, adds the configuration
-            Configuration curr = new SoltrChessModel(this);
+            SoltrChessModel curr = new SoltrChessModel(this);
             Coordinates thisCoor = validPossibilities.get(i);
-            String [][]thisBoard = ((SoltrChessModel)curr).getBoard();
-            String taken;
-            if(!(thisBoard[thisCoor.getX()][thisCoor.getY()].equals("-"))){
-                taken = thisBoard[thisCoor.getX()][thisCoor.getY()];
-            }
-            else{
-                taken = "-";
-            }
-
-            ((SoltrChessModel)curr).modifyBoard(x,y,"-");
-            ((SoltrChessModel)curr).modifyBoard(thisCoor.getX(), thisCoor.getY(), "N");
+            curr.board[x][y] = "-";
+            curr.board[thisCoor.getX()][thisCoor.getY()] = "N";
             possibleConfigs.add(curr);
-            thisBoard = ((SoltrChessModel)curr).getBoard();
-            numChar.add(getNumChar(thisBoard));
-
-//            ((SoltrChessModel)curr).modifyBoard(x,y,"N");
-//            ((SoltrChessModel)curr).modifyBoard(thisCoor.getX(), thisCoor.getY(), taken);
         }
         return possibleConfigs;
     }
@@ -519,20 +461,27 @@ public class SoltrChessModel extends Observable implements Configuration{
 
     @Override
     public boolean isValid() {
-        return true;
+        if(getNumChar(previousBoard) - getNumChar(board) == 1){
+            return true;
+        }
+        return false;
     }
 
     @Override
     public boolean isGoal() {
-        int numberOfElements = 0;
-        for(int i = 0; i< BOARD_SIZE; i++){
-            for(int j = 0; j<BOARD_SIZE; j++){
-                if(!board[i][j].equals("-")){
-                    numberOfElements++;
-                }
-            }
-        }
+        int numberOfElements = getNumChar(this.board);
         if(numberOfElements == 1){return true;}
         else{return false;}
+    }
+
+    public String toString(){
+        String output = "";
+        for(int i =0; i<board.length;i++){
+            for(int j = 0; j<board.length; j++){
+                output += board[i][j];
+            }
+            output += "\n";
+        }
+        return output;
     }
 }

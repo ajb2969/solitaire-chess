@@ -8,6 +8,7 @@ package backtracking;/*
 
 import model.SoltrChessModel;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,7 +52,23 @@ public class Backtracker {
      *         If there are none, return null.
      */
     public List< Configuration > solveWithPath( Configuration current ) {
-        // YOUR CODE HERE
+        LinkedList<Configuration> solution = new LinkedList<Configuration>();
+        if (current.isGoal()) {
+            solution.add(current);
+            return solution;
+        } else {
+            for (Configuration child : current.getSuccessors()) {
+                if (child.isValid()) {
+                    List<Configuration> a = solveWithPath(child);
+                    if(a != null){
+                        solution.add(current);
+                        solution.addAll(a);
+                        return solution;
+                    }
+                }
+            }
+            // implicit backtracking happens here
+        }
         return null;
     }
 
