@@ -22,6 +22,28 @@ public class SoltrChessModel extends Observable implements Configuration{
     public SoltrChessModel(String fileName){
         board = makeBoard(fileName);
     }
+
+    public String [][] getBoard(){
+        return board;
+    }
+
+    public String getCurrFile(){
+        return currFile;
+    }
+
+    public HashMap<Coordinates,String> getCoordinates(){
+        HashMap<Coordinates, String > piecesOnBoard = new HashMap<Coordinates, String >();
+        for(int i = 0; i<BOARD_SIZE; i++){
+            for(int j = 0; j<BOARD_SIZE; j++){
+                if(!(board[i][j].equals("-"))){
+                    piecesOnBoard.put(new Coordinates(i,j), board[i][j]);//builds hashmap, puts each piece and it's coordinate in hashmap
+                }
+            }
+        }
+        return piecesOnBoard;
+    }
+
+
     public int getNumChar(String [][] b){
         int chr = 0;
         for(int i = 0; i<BOARD_SIZE; i++){
@@ -240,7 +262,6 @@ public class SoltrChessModel extends Observable implements Configuration{
                 if(((currObject.getX() >= 0) && currObject.getX()<BOARD_SIZE) && (currObject.getY()>=0 && currObject.getY()<BOARD_SIZE)){
                     validPossibilities.add(currObject);
                 }
-
             }
             for(Coordinates c: validPossibilities){
                 if ((c.getX() == dR) && (c.getY() == dC) && (!board[dR][dC].equals("-"))){
@@ -319,30 +340,10 @@ public class SoltrChessModel extends Observable implements Configuration{
 
     }
 
-    private void announce(String arg) {
+    public void announce(String arg) {
         setChanged();
         notifyObservers(arg);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -606,4 +607,57 @@ public class SoltrChessModel extends Observable implements Configuration{
         }
         return output;
     }
+
+
+
+
+    public void hint(){
+        List<Configuration> a = obj.solveWithPath(this);
+        if(a != null){
+            a.remove(0);
+            System.out.println("Hint:");
+            System.out.println(a.get(0).toString());
+            String [][] b = ((SoltrChessModel)a.get(0)).board;
+            for(int i = 0; i<BOARD_SIZE; i++){
+                System.arraycopy(b[i],0,board[i],0, BOARD_SIZE);
+            }
+            if(getNumChar(board) == 1){
+                System.out.println("You've won, Congratulations");
+            }
+        }
+        else{
+            System.out.println("There is no hint");
+        }
+    }
+
+    public void solve(){
+        List<Configuration> a = obj.solveWithPath(this);
+        if(a != null){
+            for(int i =0; i<a.size();i++){
+                System.out.println("Step " + (i+1) + ": ");
+                System.out.println(a.get(i).toString());
+            }
+            System.out.println("You won, Congratulations!");
+
+        }
+        else{
+            System.out.println("There is no solution");
+        }
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

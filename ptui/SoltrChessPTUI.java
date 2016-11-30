@@ -21,6 +21,7 @@ public class SoltrChessPTUI implements Observer {
         initializeView();
     }
 
+
     // CONTROLLER
     public void run() {
         Scanner input = new Scanner(System.in);
