@@ -9,6 +9,7 @@ package gui;
 
 import com.sun.javafx.collections.ImmutableObservableList;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -20,7 +21,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import model.SoltrChessModel;
+import model.*;
 import model.Coordinates;
 
 import java.io.File;
@@ -50,9 +51,56 @@ public class SoltrChessGUI extends Application implements Observer {
     private String [][] board;
     private GridPane gridPane;
     private Label title;
-    @Override
-    public void update(Observable o, Object arg) {
+    private Label moves;
+    private Button b;
+    private Stack<Coordinates> moveStack;
+
+    public void updateMethod() {
+        board = model.getBoard();
         title.setText("Game File: " + model.getCurrFile());
+        moves.setText("Moves: " + model.getNumOfMoves());
+
+        Image oneFront = new Image (getClass().getResourceAsStream("resources/dark.png"));
+        Image twoFront = new Image(getClass().getResourceAsStream("resources/light.png"));
+        BackgroundImage backgroundImage1 = new BackgroundImage( new Image( getClass().getResource("resources/light.png").toExternalForm()), BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
+        Background background1 = new Background(backgroundImage1);
+
+        BackgroundImage backgroundImage2 = new BackgroundImage( new Image( getClass().getResource("resources/dark.png").toExternalForm()), BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
+        Background background2 = new Background(backgroundImage2);
+
+
+        //gridPane.setMinSize(300,500);
+        for(int i = 0; i<BOARD_SIZE; i++){
+            for(int j = 0; j<BOARD_SIZE; j++){
+                b= new Button();
+                if((i + j) % 2 == 0){
+                    b.setBackground(background1);
+                    if(board[i][j].equals("P")){b.setGraphic(new ImageView(getFotos.get("P")));}
+                    else if(board[i][j].equals("N")){b.setGraphic(new ImageView(getFotos.get("N")));}
+                    else if(board[i][j].equals("R")){b.setGraphic(new ImageView(getFotos.get("R")));}
+                    else if(board[i][j].equals("B")){b.setGraphic(new ImageView(getFotos.get("B")));}
+                    else if(board[i][j].equals("K")){b.setGraphic(new ImageView(getFotos.get("K")));}
+                    else if(board[i][j].equals("Q")){b.setGraphic(new ImageView(getFotos.get("Q")));}
+                    else{b.setGraphic(new ImageView(twoFront));}
+
+
+                }
+                else{
+                    b.setBackground(background2);
+                    if(board[i][j].equals("P")){b.setGraphic(new ImageView(getFotos.get("P")));}
+                    else if(board[i][j].equals("N")){b.setGraphic(new ImageView(getFotos.get("N")));}
+                    else if(board[i][j].equals("R")){b.setGraphic(new ImageView(getFotos.get("R")));}
+                    else if(board[i][j].equals("B")){b.setGraphic(new ImageView(getFotos.get("B")));}
+                    else if(board[i][j].equals("K")){b.setGraphic(new ImageView(getFotos.get("K")));}
+                    else if(board[i][j].equals("Q")){b.setGraphic(new ImageView(getFotos.get("Q")));}
+                    else{b.setGraphic(new ImageView(oneFront));}
+                }
+                int r = i;
+                int c = j;
+                b.setOnAction(event -> selectCard(r,c));
+                gridPane.add(b,j,i);
+            }
+        }
     }
 
 
@@ -76,24 +124,50 @@ public class SoltrChessGUI extends Application implements Observer {
         Image oneFront = new Image (getClass().getResourceAsStream("resources/dark.png"));
         Image twoFront = new Image(getClass().getResourceAsStream("resources/light.png"));
 
-        BorderPane mainPane = new BorderPane();
-        mainPane.prefHeight(300);
-        mainPane.prefWidth(500);
+        BackgroundImage backgroundImage1 = new BackgroundImage( new Image( getClass().getResource("resources/light.png").toExternalForm()), BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
+        Background background1 = new Background(backgroundImage1);
 
-        gridPane = new GridPane();//adds the
+        BackgroundImage backgroundImage2 = new BackgroundImage( new Image( getClass().getResource("resources/dark.png").toExternalForm()), BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
+        Background background2 = new Background(backgroundImage2);
+
+
+        BorderPane mainPane = new BorderPane();
+        //mainPane.setMinSize(500,300);
+
+        gridPane = new GridPane();//adds the grid
+
+        //gridPane.setMinSize(300,500);
         for(int i = 0; i<BOARD_SIZE; i++){
             for(int j = 0; j<BOARD_SIZE; j++){
-                Button b = new Button();
+                b= new Button();
                 if((i + j) % 2 == 0){
-                    b.setGraphic(new ImageView(oneFront));
+                    b.setBackground(background1);
+                    if(board[i][j].equals("P")){b.setGraphic(new ImageView(getFotos.get("P")));}
+                    else if(board[i][j].equals("N")){b.setGraphic(new ImageView(getFotos.get("N")));}
+                    else if(board[i][j].equals("R")){b.setGraphic(new ImageView(getFotos.get("R")));}
+                    else if(board[i][j].equals("B")){b.setGraphic(new ImageView(getFotos.get("B")));}
+                    else if(board[i][j].equals("K")){b.setGraphic(new ImageView(getFotos.get("K")));}
+                    else if(board[i][j].equals("Q")){b.setGraphic(new ImageView(getFotos.get("Q")));}
+                    else{b.setGraphic(new ImageView(twoFront));}
+
+
                 }
                 else{
-                    b.setGraphic(new ImageView(twoFront));
+                    b.setBackground(background2);
+                    if(board[i][j].equals("P")){b.setGraphic(new ImageView(getFotos.get("P")));}
+                    else if(board[i][j].equals("N")){b.setGraphic(new ImageView(getFotos.get("N")));}
+                    else if(board[i][j].equals("R")){b.setGraphic(new ImageView(getFotos.get("R")));}
+                    else if(board[i][j].equals("B")){b.setGraphic(new ImageView(getFotos.get("B")));}
+                    else if(board[i][j].equals("K")){b.setGraphic(new ImageView(getFotos.get("K")));}
+                    else if(board[i][j].equals("Q")){b.setGraphic(new ImageView(getFotos.get("Q")));}
+                    else{b.setGraphic(new ImageView(oneFront));}
                 }
-                gridPane.add(b,i,j);
+                int r = i;
+                int c = j;
+                b.setOnAction(event -> selectCard(r,c));
+                gridPane.add(b,j,i);
             }
         }
-
 
         mainPane.setCenter(gridPane);
         HBox titleBox = new HBox();
@@ -101,18 +175,19 @@ public class SoltrChessGUI extends Application implements Observer {
         titleBox.getChildren().add(title);
         mainPane.setTop(titleBox);
         titleBox.setAlignment(Pos.CENTER);
-        HBox buttons = new HBox();
+        HBox buttonsAndLabels = new HBox();
+        moves = new Label("Moves: " + model.getNumOfMoves());
         Button newGame = new Button("New Game");
         newGame.setOnAction(event -> newGame(primaryStage));
         Button restart = new Button("Restart");
-        restart.setOnAction(event -> model.makeBoard(filename));
+        restart.setOnAction(event -> model.makeBoard(model.getCurrFile()));
         Button hint = new Button("Hint");
         hint.setOnAction(event -> model.hint());
         Button solve = new Button("Solve");
-        solve.setOnAction(event->model.solve());
-        buttons.getChildren().addAll(newGame,restart,hint,solve);
-        mainPane.setBottom(buttons);
-        buttons.setAlignment(Pos.CENTER);
+        solve.setOnAction(event-> new Thread(() -> model.solve()).start());
+        buttonsAndLabels.getChildren().addAll(newGame,restart,hint,solve,moves);
+        mainPane.setBottom(buttonsAndLabels);
+        buttonsAndLabels.setAlignment(Pos.CENTER);
 
         Scene scene = new Scene(mainPane);
         primaryStage.setTitle("Solitaire Chess");
@@ -122,17 +197,16 @@ public class SoltrChessGUI extends Application implements Observer {
         primaryStage.show();
     }
 
-    public void setFileName(String file){
-        this.filename = file;
-    }
-
     @Override
     public void init()throws Exception{
         System.out.println("inti: Initialize and connect to model!");
         Parameters parameters = getParameters();
         ArrayList<String> param = new ArrayList<String>(parameters.getRaw());
         model = new SoltrChessModel(param.get(0));
+        filename = param.get(0);
+        moveStack = new Stack<Coordinates>();
         this.model.addObserver(this);
+
     }
 
 
@@ -156,15 +230,27 @@ public class SoltrChessGUI extends Application implements Observer {
         }
         fileNameCompleted = fileNameCompleted.substring(1);
         model.makeBoard(fileNameCompleted);
+        model.setNumOfMoves(1);
         model.announce("Board changed");
-
-
-
-
     }
 
 
 
+    public void selectCard(int r, int c){
+        if(moveStack.size() == 0){
+            moveStack.add(new Coordinates(r,c));//source
+        }
+        else if(moveStack.size() == 1){
+            moveStack.add(new Coordinates(r,c));//destination
+            Coordinates dest = moveStack.pop();
+            Coordinates src = moveStack.pop();
+            model.evalMove(src.getX(),src.getY(),dest.getX(),dest.getY());
+        }
+    }
 
 
+    @Override
+    public void update(Observable o, Object arg) {
+        Platform.runLater(() -> updateMethod());
+    }
 }
