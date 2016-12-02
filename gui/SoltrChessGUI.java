@@ -210,7 +210,7 @@ public class SoltrChessGUI extends Application implements Observer {
         buttonsAndLabels.setAlignment(Pos.CENTER);
 
         Scene scene = new Scene(mainPane);
-        primaryStage.setTitle("Solitaire Chess");
+        primaryStage.setTitle("Solitaire Chess- Alex Brown && Raymond Gonzalez");
 
         primaryStage.setScene(scene);
         this.primaryStage = primaryStage;
