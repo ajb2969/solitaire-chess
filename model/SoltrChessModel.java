@@ -2,20 +2,14 @@ package model;
 import backtracking.Backtracker;
 import backtracking.Configuration;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-import jdk.nashorn.internal.runtime.regexp.joni.Config;
-import jdk.nashorn.internal.runtime.regexp.joni.ScanEnvironment;
-import java.awt.*;
 import java.io.*;
-import java.lang.reflect.Parameter;
 import java.util.*;
 import java.util.List;
 import java.util.Observable;
-import model.Card;
 
 /**
  * Created by alexbrown on 11/11/16.
@@ -28,18 +22,46 @@ public class SoltrChessModel extends Observable implements Configuration {
     private String[][] previousBoard = new String[BOARD_SIZE][BOARD_SIZE];
     private ArrayList<Configuration> solution;
     private int numOfMoves;
+    private boolean hasChanged = false;
+    private Coordinates mostRecentMove;
+    private Boolean solveCalled = false;
+    private Boolean hintCalled = false;
+    private Boolean solutionExisting = true;
+    private Boolean firstMoveMade = false;
 
     public SoltrChessModel(String fileName) {
         board = makeBoard(fileName);
+        mostRecentMove = new Coordinates(0,0);
     }
 
     public String[][] getBoard() {
         return board;
     }
 
+    public boolean getSolutionExisting(){
+        return solutionExisting;
+    }
+
+    public boolean getFirstMoveMade(){
+        return firstMoveMade;
+    }
+
+    public boolean getHasChanged(){return hasChanged;}
+
+    public int getRecentMoveRow(){
+        return mostRecentMove.getX();
+    }
+    public int getRecentMoveCol(){
+        return mostRecentMove.getY();
+    }
+
     public int getNumOfMoves() {
         return numOfMoves;
     }
+
+    public boolean getSolveCalled(){return solveCalled;}
+
+    public boolean getHintCalled(){return hintCalled;}
 
     public void setNumOfMoves(int num) {
         numOfMoves = num;
@@ -84,7 +106,9 @@ public class SoltrChessModel extends Observable implements Configuration {
 
     public String[][] makeBoard(String fileName) {
         board = new String[BOARD_SIZE][BOARD_SIZE];
-        numOfMoves = 1;
+        firstMoveMade = false;
+
+        numOfMoves = 0;
         try {
             currFile = fileName;
             Scanner input = new Scanner(new File(fileName));
@@ -619,11 +643,43 @@ public class SoltrChessModel extends Observable implements Configuration {
     }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //---------------GUI Methods-----------------//
 
     public void hint() {
         List<Configuration> a = obj.solveWithPath(this);
         if (a != null && a.size() > 1) {
+            hintCalled = true;
             a.remove(0);
             System.out.println(a.get(0).toString());
             String[][] b = ((SoltrChessModel) a.get(0)).board;
@@ -660,25 +716,39 @@ public class SoltrChessModel extends Observable implements Configuration {
                 }
             }
             boardLines = new ArrayList<String>();
+            mostRecentMove = new Coordinates(0,0);
 
             announce("Got Solution");
             try {
-                Thread.sleep(3000);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+            setNumOfMoves(numOfMoves + 1);
         }
     }
 
+    public boolean solutionWithCurrBoard(){
+        Optional <Configuration> a = obj.solve(this);
+        if(a.isPresent()){
+            solutionExisting = true;
+        }
+        else{
+            solutionExisting = false;
+        }
+        return solutionExisting;
+    }
 
     public void solve() {
         List<Configuration> a = obj.solveWithPath(this);
         if (a != null) {
+            solveCalled = true;
             getSolution(a);
             numOfMoves += a.size() - 1;
+            solutionExisting = true;
 
         } else {
-            System.out.println("There is no solution");
+            solutionExisting = false;
         }
     }
 
@@ -703,6 +773,9 @@ public class SoltrChessModel extends Observable implements Configuration {
                     String symbolBeingMoved = board[sR][sC];
                     board[dR][dC] = symbolBeingMoved;
                     board[sR][sC] = "-";
+                    hasChanged = true;
+                    firstMoveMade = true;
+                    mostRecentMove = new Coordinates(dR,dC);
                 }
             }
             announce(null);
@@ -730,6 +803,9 @@ public class SoltrChessModel extends Observable implements Configuration {
                     String symbolBeingMoved = board[sR][sC];
                     board[dR][dC] = symbolBeingMoved;
                     board[sR][sC] = "-";
+                    hasChanged = true;
+                    firstMoveMade = true;
+                    mostRecentMove = new Coordinates(dR,dC);
                 }
             }
             announce(null);
@@ -756,6 +832,9 @@ public class SoltrChessModel extends Observable implements Configuration {
                     String symbolBeingMoved = board[sR][sC];
                     board[dR][dC] = symbolBeingMoved;
                     board[sR][sC] = "-";
+                    hasChanged = true;
+                    firstMoveMade = true;
+                    mostRecentMove = new Coordinates(dR,dC);
                 }
             }
             announce(null);
@@ -783,6 +862,9 @@ public class SoltrChessModel extends Observable implements Configuration {
                     String symbolBeingMoved = board[sR][sC];
                     board[dR][dC] = symbolBeingMoved;
                     board[sR][sC] = "-";
+                    hasChanged = true;
+                    firstMoveMade = true;
+                    mostRecentMove = new Coordinates(dR,dC);
                 }
             }
 
@@ -808,11 +890,14 @@ public class SoltrChessModel extends Observable implements Configuration {
                     String symbolBeingMoved = board[sR][sC];
                     board[dR][dC] = symbolBeingMoved;
                     board[sR][sC] = "-";
+                    hasChanged = true;
+                    firstMoveMade = true;
+                    mostRecentMove = new Coordinates(dR,dC);
                 }
             }
             announce(null);
 
-        } else { //contains Queen - finished
+        } else if (board[sR][sC].contains("Q")){ //contains Queen - finished
             ArrayList<Coordinates> allMovePossibilities = new ArrayList<Coordinates>();
             ArrayList<Coordinates> validPossibilities = new ArrayList<Coordinates>();
             for (int i = 1; i < BOARD_SIZE; i++) {
@@ -836,12 +921,16 @@ public class SoltrChessModel extends Observable implements Configuration {
                     String symbolBeingMoved = board[sR][sC];
                     board[dR][dC] = symbolBeingMoved;
                     board[sR][sC] = "-";
+                    hasChanged = true;
+                    firstMoveMade = true;
+                    mostRecentMove = new Coordinates(dR,dC);
                 }
             }
             announce(null);
 
         }
-
+        else{hasChanged=false;}
+        setNumOfMoves(getNumOfMoves()+1);
 
     }
 }

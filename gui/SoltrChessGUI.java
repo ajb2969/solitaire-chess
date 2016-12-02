@@ -6,8 +6,6 @@
  */
 
 package gui;
-
-import com.sun.javafx.collections.ImmutableObservableList;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
@@ -23,7 +21,6 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import model.*;
 import model.Coordinates;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Observable;
@@ -57,8 +54,17 @@ public class SoltrChessGUI extends Application implements Observer {
 
     public void updateMethod() {
         board = model.getBoard();
-        title.setText("Game File: " + model.getCurrFile());
-        moves.setText("Moves: " + model.getNumOfMoves());
+        if(model.isGoal() && model.getHasChanged() && !model.getSolveCalled() && !model.getHintCalled()){
+            title.setText("Game File: " + model.getCurrFile() + "    Most Recent Position: "+ board[model.getRecentMoveRow()][model.getRecentMoveCol()] + " to square "+"["+model.getRecentMoveRow()+","+model.getRecentMoveCol() +"]" +" - You Win!");
+            moves.setText("Moves: " + model.getNumOfMoves());
+        }else if (model.getFirstMoveMade()){
+            title.setText("Game File: " + model.getCurrFile() + "      Most Recent Position: "+ board[model.getRecentMoveRow()][model.getRecentMoveCol()] + " to square "+"["+model.getRecentMoveRow()+","+model.getRecentMoveCol() +"]");
+            moves.setText("Moves: " + model.getNumOfMoves());
+        }
+        else{
+            moves.setText("Moves: " + model.getNumOfMoves());
+        }
+
 
         Image oneFront = new Image (getClass().getResourceAsStream("resources/dark.png"));
         Image twoFront = new Image(getClass().getResourceAsStream("resources/light.png"));
@@ -101,12 +107,26 @@ public class SoltrChessGUI extends Application implements Observer {
                 gridPane.add(b,j,i);
             }
         }
+
+        if(!model.solutionWithCurrBoard()){
+            Stage newStage = new Stage();
+            BorderPane mainPane = new BorderPane();
+            Button restart = new Button("Restart");
+            restart.setOnAction(event -> model.makeBoard(model.getCurrFile()));
+            mainPane.setCenter(new Label("No Solution. Press restart"));
+            mainPane.setBottom(restart);
+            Scene scene = new Scene(mainPane);
+            newStage.setTitle("No Solution Error");
+            newStage.setScene(scene);
+            newStage.show();
+        }
+
+
     }
 
 
     public void start( Stage primaryStage ) throws Exception {
         board = model.getBoard();
-        model.printBoard();
         coordinates = model.getCoordinates();
         getFotos = new HashMap<String,Image>();
         Image bishop = new Image(getClass().getResourceAsStream("resources/bishop.png"));
@@ -199,7 +219,6 @@ public class SoltrChessGUI extends Application implements Observer {
 
     @Override
     public void init()throws Exception{
-        System.out.println("inti: Initialize and connect to model!");
         Parameters parameters = getParameters();
         ArrayList<String> param = new ArrayList<String>(parameters.getRaw());
         model = new SoltrChessModel(param.get(0));
@@ -230,7 +249,7 @@ public class SoltrChessGUI extends Application implements Observer {
         }
         fileNameCompleted = fileNameCompleted.substring(1);
         model.makeBoard(fileNameCompleted);
-        model.setNumOfMoves(1);
+        model.setNumOfMoves(0);
         model.announce("Board changed");
     }
 
