@@ -6,7 +6,6 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.Scanner;
 import java.util.stream.IntStream;
-
 /**
  * Part of SoltrChess project.
  * Created 11 2015
@@ -20,8 +19,6 @@ public class SoltrChessPTUI implements Observer {
         this.model = new SoltrChessModel(fileName);
         initializeView();
     }
-
-
     // CONTROLLER
     public void run() {
         Scanner input = new Scanner(System.in);
@@ -30,14 +27,11 @@ public class SoltrChessPTUI implements Observer {
             String choice = input.nextLine(); //if input is incorrect, re ask again
             model.evaluate(choice);
         }
-
     }
-
     public void initializeView() {
         this.model.addObserver(this);
         update(this.model, null);
     }
-
     @Override
     //
     public void update(Observable o, Object arg) {

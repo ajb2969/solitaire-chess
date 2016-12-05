@@ -63,6 +63,7 @@ public class SoltrChessGUI extends Application implements Observer {
         }
         else{
             moves.setText("Moves: " + model.getNumOfMoves());
+            title.setText("Game File: " + model.getCurrFile());
         }
 
 
@@ -231,26 +232,34 @@ public class SoltrChessGUI extends Application implements Observer {
 
 
     public void newGame(Stage mainStage){
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Open Resource File");
-        File selectedFile = fileChooser.showOpenDialog(mainStage);
-        String fileName = selectedFile.toString();
-        ArrayList<String> splitFileName = new ArrayList<String>();
-        for(String c:fileName.split("/")){
-            splitFileName.add(c);
+        try {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Open Resource File");
+            File selectedFile = fileChooser.showOpenDialog(mainStage);
+            String fileName = selectedFile.toString();
+            ArrayList<String> splitFileName = new ArrayList<String>();
+            for (String c : fileName.split("/")) {
+                splitFileName.add(c);
+            }
+            int i = 0;
+            while (!(splitFileName.get(i).equals("data"))) {
+                splitFileName.remove(i);
+            }
+            String fileNameCompleted = "";
+            for (String e : splitFileName) {
+                fileNameCompleted += "/" + e;
+            }
+            fileNameCompleted = fileNameCompleted.substring(1);
+            model.makeBoard(fileNameCompleted);
+            model.setNumOfMoves(0);
+            model.announce("Board changed");
         }
-        int i =0;
-        while(!(splitFileName.get(i).equals("data"))){
-            splitFileName.remove(i);
+        catch(IndexOutOfBoundsException e){
+            System.out.println("Index out of bounds exception");
+            System.exit(1);
         }
-        String fileNameCompleted = "";
-        for(String e: splitFileName){
-            fileNameCompleted += "/" + e;
-        }
-        fileNameCompleted = fileNameCompleted.substring(1);
-        model.makeBoard(fileNameCompleted);
-        model.setNumOfMoves(0);
-        model.announce("Board changed");
+
+
     }
 
 

@@ -107,6 +107,8 @@ public class SoltrChessModel extends Observable implements Configuration {
     public String[][] makeBoard(String fileName) {
         board = new String[BOARD_SIZE][BOARD_SIZE];
         firstMoveMade = false;
+        hintCalled = false;
+        solveCalled = false;
 
         numOfMoves = 0;
         try {
