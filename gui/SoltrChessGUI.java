@@ -125,7 +125,10 @@ public class SoltrChessGUI extends Application implements Observer {
 
     }
 
-
+    /**
+     * Start constructs the layout of the game
+     * @param primaryStage - The main stage that is being created.
+     */
     public void start( Stage primaryStage ) throws Exception {
         board = model.getBoard();
         coordinates = model.getCoordinates();
@@ -220,6 +223,7 @@ public class SoltrChessGUI extends Application implements Observer {
 
     @Override
     public void init()throws Exception{
+        //Initilization of the model
         Parameters parameters = getParameters();
         ArrayList<String> param = new ArrayList<String>(parameters.getRaw());
         model = new SoltrChessModel(param.get(0));
@@ -230,7 +234,10 @@ public class SoltrChessGUI extends Application implements Observer {
     }
 
 
-
+    /**
+     * Creates a new game based on the input file.
+     * @param mainStage the stage of the game
+     */
     public void newGame(Stage mainStage){
         try {
             FileChooser fileChooser = new FileChooser();
@@ -263,7 +270,11 @@ public class SoltrChessGUI extends Application implements Observer {
     }
 
 
-
+    /**
+     * Selects the "card" on the board based on the row/column that the card is located.
+     * @param r - The row value
+     * @param c - The column value
+     */
     public void selectCard(int r, int c){
         if(moveStack.size() == 0){
             moveStack.add(new Coordinates(r,c));//source

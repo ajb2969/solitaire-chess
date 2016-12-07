@@ -15,25 +15,69 @@ import java.util.Observable;
  * Created by alexbrown on 11/11/16.
  */
 public class SoltrChessModel extends Observable implements Configuration {
+    /*
+        * The default size of the board.
+        */
     private static final int BOARD_SIZE = 4;
-    private String[][] board;
+    /*
+     * The board.
+     */
+    private String [][]board;
+    /*
+     * The file that is being looked at.
+     */
     private static String currFile;
+    /*
+     * Backtracker object.
+     */
     private Backtracker obj = new Backtracker();
-    private String[][] previousBoard = new String[BOARD_SIZE][BOARD_SIZE];
+    /*
+     * The previous assortment of the board.
+     */
+    private String [][] previousBoard = new String[BOARD_SIZE][BOARD_SIZE];
+    /*
+     * ArrayList that contains the solution.
+     */
     private ArrayList<Configuration> solution;
+    /*
+     * The number of moves that are made.
+     */
     private int numOfMoves;
+    /*
+     * Check to see if there has been a change made.
+     */
     private boolean hasChanged = false;
+    /*
+     * Coordinates for the most recent move made.
+     */
     private Coordinates mostRecentMove;
+    /*
+     * Boolean for solve to check if it was used.
+     */
     private Boolean solveCalled = false;
+    /*
+     * Boolean for hint that checks if it was used.
+     */
     private Boolean hintCalled = false;
+    /*
+     * Boolean that is changed if there is no solution available.
+     */
     private Boolean solutionExisting = true;
+    /*
+     * Boolean that is changed once the first move has been made.
+     */
     private Boolean firstMoveMade = false;
 
+    /*
+     * Makes the board base on the inputted file.
+    */
     public SoltrChessModel(String fileName) {
         board = makeBoard(fileName);
         mostRecentMove = new Coordinates(0,0);
     }
-
+    /*
+     * A bunch of helper methods that return the boolean, coordinates, number of moves, the file, or the board.
+     */
     public String[][] getBoard() {
         return board;
     }
@@ -71,6 +115,10 @@ public class SoltrChessModel extends Observable implements Configuration {
         return currFile;
     }
 
+    /*
+     * A hash map that is based on the coordinates and the type of chess piece.
+     * @return - The piece on the board for their corresponding coordinates.
+     */
     public HashMap<Coordinates, String> getCoordinates() {
         HashMap<Coordinates, String> piecesOnBoard = new HashMap<Coordinates, String>();
         for (int i = 0; i < BOARD_SIZE; i++) {
@@ -83,6 +131,9 @@ public class SoltrChessModel extends Observable implements Configuration {
         return piecesOnBoard;
     }
 
+    /*
+    * Helper method that returns the number characters.
+    */
     public int getNumChar(String[][] b) {
         int chr = 0;
         for (int i = 0; i < BOARD_SIZE; i++) {
@@ -95,6 +146,10 @@ public class SoltrChessModel extends Observable implements Configuration {
         return chr;
     }
 
+    /*
+    * Creates a copy of the board.
+    * @param copy - A copy of the model
+    */
     public SoltrChessModel(SoltrChessModel copy) {
         board = new String[BOARD_SIZE][BOARD_SIZE];
         this.currFile = copy.currFile;
@@ -104,6 +159,11 @@ public class SoltrChessModel extends Observable implements Configuration {
         }
     }
 
+    /*
+     * Makes the board based on the inputted file.
+     * @param fileName - one of 5 games with different configurations for each.
+     * @return The completed board with the correct configuration (the one specified in the file)
+     */
     public String[][] makeBoard(String fileName) {
         board = new String[BOARD_SIZE][BOARD_SIZE];
         firstMoveMade = false;
@@ -147,11 +207,19 @@ public class SoltrChessModel extends Observable implements Configuration {
         }
         return board;
     }
-
+    /*
+     * Helper method that prints out the board.
+     */
     public void printBoard() {
         System.out.println(toString());
     }
-
+    /**
+     * Method that evaluates all possible moves a piece can move on the board.
+     * @param sR - The source row
+     * @param sC - The source column
+     * @param dR - The destination row
+     * @param dC - The destination column
+     */
     public void evaluateMove(int sR, int sC, int dR, int dC) {
         if (board[sR][sC].contains("-")) {
             System.out.println("Invalid source element");
@@ -319,6 +387,10 @@ public class SoltrChessModel extends Observable implements Configuration {
         }
     }
 
+    /**
+     * Evaluates the input of the user.
+     * @param choice - The input the user chooses.
+     */
     public void evaluate(String choice) {
         Scanner input = new Scanner(System.in);
         if (choice.equals("move")) {
@@ -387,7 +459,10 @@ public class SoltrChessModel extends Observable implements Configuration {
         notifyObservers(arg);
     }
 
-
+    /**
+     * Gets all possible configurations possible on the board.
+     * @return The possible configurations of the board.
+     */
     @Override
     public Collection<Configuration> getSuccessors() {
         HashMap<Coordinates, String> piecesOnBoard = new HashMap<Coordinates, String>();
@@ -438,7 +513,12 @@ public class SoltrChessModel extends Observable implements Configuration {
 
         return possibleConfigs;
     }
-
+    /**
+     * Gets the possible configurations of the King piece
+     * @param x - The x-coordinate
+     * @param y - The y-coordinate
+     * @return Returns the possible configurations of the king.
+     */
 
     public ArrayList<Configuration> getPossibleConfigsKing(int x, int y) {
         ArrayList<Coordinates> allMovePossibilities = new ArrayList<Coordinates>();
@@ -469,7 +549,12 @@ public class SoltrChessModel extends Observable implements Configuration {
         }
         return possibleConfigs;
     }
-
+    /**
+     * Gets the possible configurations of the Queen piece
+     * @param x - The x-coordinate
+     * @param y - The y-coordinate
+     * @return Returns the possible configurations of the queen.
+     */
     public ArrayList<Configuration> getPossibleConfigsQueen(int x, int y) {
         ArrayList<Coordinates> allMovePossibilities = new ArrayList<Coordinates>();
         ArrayList<Coordinates> validPossibilities = new ArrayList<Coordinates>();
@@ -499,7 +584,12 @@ public class SoltrChessModel extends Observable implements Configuration {
         }
         return possibleConfigs;
     }
-
+    /**
+     * Gets the possible configurations of the Rook piece
+     * @param x - The x-coordinate
+     * @param y - The y-coordinate
+     * @return Returns the possible configurations of the rook.
+     */
     public ArrayList<Configuration> getPossibleConfigsRook(int x, int y) {
         ArrayList<Coordinates> allMovePossibilities = new ArrayList<Coordinates>();
         ArrayList<Coordinates> validPossibilities = new ArrayList<Coordinates>();
@@ -526,7 +616,12 @@ public class SoltrChessModel extends Observable implements Configuration {
         return possibleConfigs;
     }
 
-
+    /**
+     * Gets the possible configurations of the Bishop piece
+     * @param x - The x-coordinate
+     * @param y - The y-coordinate
+     * @return Returns the possible configurations of the bishop.
+     */
     public ArrayList<Configuration> getPossibleConfigsBishop(int x, int y) {
         ArrayList<Configuration> possibleConfigs = new ArrayList<Configuration>();
         ArrayList<Coordinates> allMovePossibilities = new ArrayList<Coordinates>();
@@ -552,7 +647,12 @@ public class SoltrChessModel extends Observable implements Configuration {
         }
         return possibleConfigs;
     }
-
+    /**
+     * Gets the possible configurations of the Pawn piece
+     * @param x - The x-coordinate
+     * @param y - The y-coordinate
+     * @return Returns the possible configurations of the pawn.
+     */
 
     public ArrayList<Configuration> getPossibleConfigsPawn(int x, int y) {
         ArrayList<Coordinates> movePossibilities = new ArrayList<Coordinates>();
@@ -584,6 +684,12 @@ public class SoltrChessModel extends Observable implements Configuration {
 
     }
 
+    /**
+     * Gets the possible configurations of the Knight piece
+     * @param x - The x-coordinate
+     * @param y - The y-coordinate
+     * @return Returns the possible configurations of the knight.
+     */
 
     public ArrayList<Configuration> getPossibleConfigsKnight(int x, int y) {
         ArrayList<Coordinates> allMovePossibilities = new ArrayList<Coordinates>();
@@ -613,7 +719,10 @@ public class SoltrChessModel extends Observable implements Configuration {
         }
         return possibleConfigs;
     }
-
+    /**
+     * Checks to see if the board is valid or not.
+     * @return - True or false depending on if the board is valid or not.
+     */
 
     @Override
     public boolean isValid() {
@@ -622,7 +731,10 @@ public class SoltrChessModel extends Observable implements Configuration {
         }
         return false;
     }
-
+    /**
+     * Checks to see if the board has the correct amount of elements (the goal).
+     * @return - The boolean response to if it has the correct amount of elements or not.
+     */
     @Override
     public boolean isGoal() {
         int numberOfElements = getNumChar(this.board);
@@ -632,7 +744,10 @@ public class SoltrChessModel extends Observable implements Configuration {
             return false;
         }
     }
-
+    /**
+     * Converts the board to a String
+     * @return The string version of the board.
+     */
     public String toString() {
         String output = "";
         for (int i = 0; i < board.length; i++) {
@@ -653,31 +768,11 @@ public class SoltrChessModel extends Observable implements Configuration {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 //---------------GUI Methods-----------------//
 
+    /**
+     * Gives the user a a hint on what step they should take to win.
+     */
     public void hint() {
         List<Configuration> a = obj.solveWithPath(this);
         if (a != null && a.size() > 1) {
@@ -703,6 +798,11 @@ public class SoltrChessModel extends Observable implements Configuration {
             newStage.show();
         }
     }
+
+    /**
+     * Gets the solutions for the board
+     * @param solutionStack - The stack that contains the solution
+     */
 
     public void getSolution(List<Configuration> solutionStack) {
         ArrayList<String> boardLines = new ArrayList<String>();
@@ -730,6 +830,10 @@ public class SoltrChessModel extends Observable implements Configuration {
         }
     }
 
+    /**
+     * Checks to see if the solution is still available with the current configuration of the board.
+     * @returns - Whether or not a solution exists with the current configuration.
+     */
     public boolean solutionWithCurrBoard(){
         Optional <Configuration> a = obj.solve(this);
         if(a.isPresent()){
@@ -740,6 +844,10 @@ public class SoltrChessModel extends Observable implements Configuration {
         }
         return solutionExisting;
     }
+
+    /**
+     * Solver method
+     */
 
     public void solve() {
         List<Configuration> a = obj.solveWithPath(this);
@@ -754,6 +862,13 @@ public class SoltrChessModel extends Observable implements Configuration {
         }
     }
 
+    /**
+     * Method that evaluates all possible moves a piece can move on the board.
+     * @param sR - The source row
+     * @param sC - The source column
+     * @param dR - The destination row
+     * @param dC - The destination column
+     */
     public void evalMove(int sR, int sC, int dR, int dC) {
         if (board[sR][sC].contains("B")) { //Bishop - finished
             ArrayList<Coordinates> allMovePossibilities = new ArrayList<Coordinates>();

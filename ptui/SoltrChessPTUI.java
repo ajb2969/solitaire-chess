@@ -13,7 +13,13 @@ import java.util.stream.IntStream;
  * @author James Heliotis
  */
 public class SoltrChessPTUI implements Observer {
+    /*
+    * The model for the view and the controller.
+    */
     private SoltrChessModel model;
+    /*
+    * Construct the PTUI
+    */
 
     public SoltrChessPTUI(String fileName) {
         this.model = new SoltrChessModel(fileName);
@@ -21,6 +27,9 @@ public class SoltrChessPTUI implements Observer {
     }
     // CONTROLLER
     public void run() {
+        /*
+         * Read a command and executes the loop.
+         */
         Scanner input = new Scanner(System.in);
         for(; ;){
             System.out.print("[move,new,restart,hint,solve,quit]> ");
@@ -29,6 +38,9 @@ public class SoltrChessPTUI implements Observer {
         }
     }
     public void initializeView() {
+        /*
+         * Initializes the view for the observer.
+         */
         this.model.addObserver(this);
         update(this.model, null);
     }
@@ -36,9 +48,10 @@ public class SoltrChessPTUI implements Observer {
     //
     public void update(Observable o, Object arg) {
         model.printBoard();
+        //Displays "You won, Congrats!!" when goal is true.
         if(model.isGoal()){
             System.out.println("You won, Congrats!!");
-            System.exit(0);
+            //System.exit(0);
         }
     }
 }
